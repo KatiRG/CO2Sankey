@@ -2,6 +2,10 @@
 <meta charset="utf-8">
 <title>SANKEY Experiment</title>
 <style>
+
+html {
+  font-family: Arial;
+}
  
 .node rect {
   cursor: move;
@@ -53,7 +57,7 @@ var svg = d3.select("#chart").append("svg")
  
 // Set the sankey diagram properties
 var sankey = d3.sankey()
-    .nodeWidth(36)
+    .nodeWidth(50)
     .nodePadding(10)
     .size([width, height]);
  
@@ -123,7 +127,7 @@ d3.json("emissions.json", function(error, graph) {
     .enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { 
-		  return "translate(" + d.x + "," + d.y + ")"; })
+	       return "translate(" + d.x + "," + d.y + ")"; })
     .call(d3.behavior.drag()
       .origin(function(d) { return d; })
       .on("dragstart", function() { 
@@ -147,7 +151,6 @@ d3.json("emissions.json", function(error, graph) {
         else if (d.name == "Gas") return "#AEC7E8"
         else if (d.name == "Gas Flaring") return "#AEC7E8"
         else if (d.name == "Cement") return "#666688"
-        //else return d.color = color(d.name.replace(/ .*/, "")); 
 	})
       .style("stroke", function(d) { 
 		    return d3.rgb(d.color).darker(2); })
