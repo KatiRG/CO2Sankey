@@ -27,6 +27,18 @@ html {
 .link:hover {
   stroke-opacity: .5;
 }
+
+div.tooltip {
+  position: absolute;
+  padding: 5px;
+  text-align: center;
+  font: 12px sans-serif;
+  background: #AAA;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #000;
+  border-radius: 8px;
+}
  
 </style>
 <body>
@@ -41,7 +53,7 @@ var units = "Mt CO2";
  
 var margin = {top: 10, right: 10, bottom: 10, left: 10},
     width = 1200 - margin.left - margin.right,
-    height = 740 - margin.top - margin.bottom;
+    height = 800 - margin.top - margin.bottom;
  
 var formatNumber = d3.format(",.2f"),    
     format = function(d) { return formatNumber(d) + " " + units; },
@@ -96,6 +108,10 @@ d3.json("emissions.json", function(error, graph) {
       .nodes(graph.nodes)
       .links(graph.links)
       .layout(32);
+
+var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
  
 // add in the links
   var link = svg.append("g").selectAll(".link")
@@ -115,11 +131,21 @@ d3.json("emissions.json", function(error, graph) {
 	})
       .sort(function(a, b) { return b.dy - a.dy; });
  
-// add the link titles
-  link.append("title")
-        .text(function(d) {
-      	return d.source.name + " → " + 
-                d.target.name + "\n" + format(d.value); });
+// add the link tooltip
+  link.on("mouseover", function(d) {      
+            div.transition()        
+                .duration(0)      
+                .style("opacity", .9);      
+            div.html(d.source.name + " → " + d.target.name + 
+			"<br><b>" + format(d.value) + "</b>")  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY) + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(0)      
+                .style("opacity", 0);   
+        });
  
 // add in the nodes
   var node = svg.append("g").selectAll(".node")
@@ -153,11 +179,22 @@ d3.json("emissions.json", function(error, graph) {
         else if (d.name == "Cement") return "#666688"
 	})
       .style("stroke", function(d) { 
-		    return d3.rgb(d.color).darker(2); })
-    .append("title")
-      .text(function(d) { 
-		    return d.name + "\n" + format(d.value); 
-      });
+		    return d3.rgb(d.color).darker(2); });
+
+// add the node tooltip
+  node.on("mouseover", function(d) {      
+            div.transition()        
+                .duration(0)      
+                .style("opacity", .9);      
+            div.html(d.name + "<br><b>" + format(d.value) + "</b>")
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY) + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(0)      
+                .style("opacity", 0);   
+        });
  
 // add in the title for the nodes
   node.append("text")
