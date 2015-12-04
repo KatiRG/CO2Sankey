@@ -109,6 +109,7 @@ d3.json("emissions.json", function(error, graph) {
       .links(graph.links)
       .layout(32);
 
+// tooltip div
 var div = d3.select("body").append("div")   
     .attr("class", "tooltip")               
     .style("opacity", 0);
