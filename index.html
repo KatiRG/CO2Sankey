@@ -39,7 +39,7 @@ var margin = {top: 10, right: 10, bottom: 10, left: 10},
     width = 1200 - margin.left - margin.right,
     height = 740 - margin.top - margin.bottom;
  
-var formatNumber = d3.format(",.0f"),    // zero decimal places
+var formatNumber = d3.format(",.2f"),    
     format = function(d) { return formatNumber(d) + " " + units; },
     color = d3.scale.category20();
  
@@ -105,6 +105,14 @@ d3.json("emissions.json", function(error, graph) {
 		  this.parentNode.appendChild(this); })
       .on("drag", dragmove));
  
+Europe = ["Europe","Spain","Ukraine","Poland","France","Italy","United Kingdom","Germany","Russian Federation","Netherlands","Czech Republic"];
+NorthAmerica = ["North America","United States","Canada","Mexico"];
+Asia = ["Asia", "China","India","Japan","South Korea","Indonesia","Thailand","Kazakhstan","Taiwan","Malaysia","Vietnam","Pakistan","Uzbekistan"];
+MiddleEast = ["Middle East","Saudi Arabia","UAE","Turkey","Iran","Kuwait","Iraq"];
+Africa = ["Africa","South Africa","Egypt","Algeria"];
+LatinAmerica = ["Latin America - Carribean","Brazil","Venezuela","Argentina"];
+Oceania = ["Oceania","Australia"];
+
 // add the rectangles for the nodes
   node.append("rect")
       .attr("height", function(d) { return d.dy; })
@@ -113,29 +121,19 @@ d3.json("emissions.json", function(error, graph) {
         console.log("d.name: ", d.name)
         console.log("d.name.replace: ", d.name.replace(/ .*/, ""))
         console.log("color(replace): ", color(d.name.replace(/ .*/, "")) )
-		    
-        if (d.name == "Europe" || d.name == "Spain" || d.name == "Ukraine" || d.name == "Poland"
-            || d.name == "France" || d.name == "Italy" || d.name == "United Kingdom" || d.name == "Germany"
-            || d.name == "Russian Federation" || d.name == "Netherlands" || d.name == "Czech Republic") return "#FF8A4D"
-        else if (d.name == "North America" || d.name == "United States" || d.name == "Canada" 
-                 || d.name == "Mexico" ) return "#BAFFC9"
-        else if (d.name == "Asia" || d.name == "China" || d.name == "India" || d.name == "Japan"
-                 || d.name == "South Korea" || d.name == "Indonesia" || d.name == "Thailand"
-                 || d.name == "Kazakhstan" || d.name == "Taiwan" || d.name == "Malaysia"
-                 || d.name == "Vietnam" || d.name == "Pakistan" || d.name == "Uzbekistan" ) return "#FFFEBB"
-        else if (d.name == "Middle East" || d.name == "Saudi Arabia" || d.name == "UAE"
-                 || d.name == "Turkey" || d.name == "Iran" || d.name == "Kuwait"
-                 || d.name == "Iraq" ) return "#F0CF28"
-        else if (d.name == "Africa" || d.name == "South Africa" || d.name == "Egypt"
-                 || d.name == "Algeria" ) return "#592062"
-        else if (d.name == "Latin Am - Carribean" || d.name == "Brazil" || d.name == "Venezuela" 
-                 || d.name == "Argentina") return "#FFB4BB"
-        else if (d.name == "Oceania" || d.name == "Australia") return "#61E3F1"
+
+	if (Europe.indexOf(d.name) != -1) return "#001489"
+        else if (NorthAmerica.indexOf(d.name) != -1) return "#ea5924"
+        else if (LatinAmerica.indexOf(d.name) != -1) return "#00A859"
+        else if (Asia.indexOf(d.name) != -1) return "#e9d019"
+        else if (MiddleEast.indexOf(d.name) != -1) return "#8b734a"
+        else if (Africa.indexOf(d.name) != -1) return "#f39340"
+        else if (Oceania.indexOf(d.name) != -1) return "#a13769"
         else if (d.name == "Coal") return "#3B3131"
         else if (d.name == "Oil") return "#886666"
+        else if (d.name == "Gas") return "#AEC7E8"
         else if (d.name == "Gas Flaring") return "#AEC7E8"
         else if (d.name == "Cement") return "#666688"
-        else if (d.name == "Gas") return "#AEC7E8"
         else return d.color = color(d.name.replace(/ .*/, "")); })
 
 
@@ -161,17 +159,11 @@ d3.json("emissions.json", function(error, graph) {
 // the function for moving the nodes
   function dragmove(d) {
     d3.select(this).attr("transform", 
-        // "translate(" + (
-        // 	   d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
-        // 	) + "," + (
-        //            d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
-        //     ) + ")");
         "translate(" + (
-             d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
-          ) + "," + (
+                   d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
+        	) + "," + (
                    d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
             ) + ")");
-
     sankey.relayout();
     link.attr("d", path);
   }
