@@ -83,7 +83,7 @@ d3.sankey = function() {
       node.sourceLinks = [];
       node.targetLinks = [];
     });
-    links.forEach(function(link) {
+    links.forEach(function(link) {      
       var source = link.source,
           target = link.target;
       if (typeof source === "number") source = link.source = nodes[link.source];
@@ -152,12 +152,31 @@ d3.sankey = function() {
     });
   }
  
-  function computeNodeDepths(iterations) {
+  function computeNodeDepths(iterations) { //iterations = 32 from .layout(32) in index.html
+    //var priorities = ['Coal', 'Oil', 'Gas', 'Cement', 'Gas Flaring'];
+
     var nodesByBreadth = d3.nest()
-        .key(function(d) { return d.x; })
-        .sortKeys(d3.ascending)
+        .key(function(d) { 
+          // console.log("d in nodesByBreadth var: ", d)
+          // console.log("d.x: ", d.x)
+          return d.x;
+          //return d.;  
+        })
+        //.sortKeys(d3.ascending) //orders the keys = d.x (x-coord of columns: 0,1130,565)
+        .sortKeys(d3.descending) //keys = d.x = 565, 1130, 0
+        // .sortKeys(function(a,b) {
+        //     return priorities.indexOf(a) - priorities.indexOf(b);
+        // })
         .entries(nodes)
-        .map(function(d) { return d.values; });
+        .map(function(d) { 
+          // console.log("iterations: ", iterations)
+          // console.log("d: ", d)
+          // console.log("d.values in computeNodeDepths: ", d.values[0])
+          // if (d.key == "0") {
+          //   console.log("key 0")
+          // }
+          return d.values; 
+        });
  
     //
     initializeNodeDepth();
@@ -170,6 +189,12 @@ d3.sankey = function() {
     }
  
     function initializeNodeDepth() {
+      //console.log("nodesByBreadth: ", nodesByBreadth)
+      // console.log("nodesByBreadth[2][2]: ", nodesByBreadth[2][2])
+      // console.log("nodesByBreadth[2][3]: ", nodesByBreadth[2][3])
+
+
+     
       var ky = d3.min(nodesByBreadth, function(nodes) {
         return (size[1] - (nodes.length - 1) * nodePadding) / d3.sum(nodes, value);
       });
@@ -181,7 +206,7 @@ d3.sankey = function() {
         });
       });
  
-      links.forEach(function(link) {
+      links.forEach(function(link) {        
         link.dy = link.value * ky;
       });
     }

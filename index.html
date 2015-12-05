@@ -129,8 +129,8 @@ var div = d3.select("body").append("div")
                else if (MiddleEast.indexOf(d.target.name) != -1) return MiddleEast_color
                else if (Africa.indexOf(d.target.name) != -1) return Africa_color
                else if (Oceania.indexOf(d.target.name) != -1) return Oceania_color
-	})
-      .sort(function(a, b) { return b.dy - a.dy; });
+	    })
+      .sort(function(a, b) { return b.dy - a.dy; }); //what does this do?
  
 // add the link tooltip
   link.on("mouseover", function(d) {      
@@ -154,12 +154,18 @@ var div = d3.select("body").append("div")
     .enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { 
-	       return "translate(" + d.x + "," + d.y + ")"; })
-    .call(d3.behavior.drag()
-      .origin(function(d) { return d; })
-      .on("dragstart", function() { 
-		  this.parentNode.appendChild(this); })
-      .on("drag", dragmove));
+        return "translate(" + d.x + "," + d.y + ")"; //positions the rectangles over the links
+      })
+    // .call(d3.behavior.drag() //Turn back on when you need to adjust a node
+    //   .origin(function(d) { return d; })
+    //   // .on("dragstart", function() { //Does not seem to be necessary...      
+		  //   // this.parentNode.appendChild(this); })
+    //   .on("drag", dragmove)
+    // )
+    .call(function () {
+      manualLayout();
+    });
+
  
 // add the rectangles for the nodes
   node.append("rect")
@@ -211,16 +217,67 @@ var div = d3.select("body").append("div")
  
 // the function for moving the nodes
   function dragmove(d) {
+    console.log("d in dragmove: ", d)
+    console.log("this: ", this)
+    console.log("height - d.dy: ", height - d.dy)
+    console.log("d3.event.y: ", d3.event.y)
     d3.select(this).attr("transform", 
         "translate(" + (
                    d.x = d.x
         	) + "," + (
                    d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
             ) + ")");
+    console.log("d in link.attr: ", d)
+    console.log("link: ", link)
+
+    console.log("their link[0][0] BEFORE: ", link[0][0])
+    console.log("link.attr(d, path): ", link.attr("d", path))
+
+    // sankey.relayout();
+    // link.attr("d", path);
+
+    console.log("their link[0][0] AFTER: ", link[0][0])
+  }
+
+// manually customize node position
+  function manualLayout() {
+    //http://stackoverflow.com/questions/10337640/how-to-access-the-dom-element-that-correlates-to-a-d3-svg-object
+    //displacements in order of foo nodes (foo[0][j])
+    var displacements = [56,299,485,647,766, 55, 746, 307, 490, 612, 677, 429];
+    var foo = d3.selectAll("g.node");
+
+    for (j=0; j < displacements.length; j++) {
+      pickNode = foo[0][j]; //equals "this" in d3.behavior.drag()...on("dragstart")
+      d = graph.nodes[j];
+
+      d3.select(pickNode).attr("transform", 
+            "translate(" + (
+                   d.x = d.x
+          ) + "," + (
+                   d.y = displacements[j] //Math.max(0, Math.min(height - d.dy, d3.event.y))
+            ) + ")");
+   
+    }
+
+        // console.log("foo: ", foo)
+        // console.log("foo[0][0] coal: ", foo[0][0])
+        // console.log("foo[0][1] oil: ", foo[0][1])
+        // console.log("foo[0][2] gas: ", foo[0][2])
+        // console.log("foo[0][3] cement: ", foo[0][3])
+        // console.log("foo[0][4] gas Flaring: ", foo[0][4])
+
+        // console.log("foo[0][5] Asia: ", foo[0][5])
+        // console.log("foo[0][6] Mid East: ", foo[0][6])
+        // console.log("foo[0][7] North Am: ", foo[0][7])
+        // console.log("foo[0][8] Europe: ", foo[0][8])
+        // console.log("foo[0][9] Latin Am: ", foo[0][9])
+        // console.log("foo[0][10] Africa: ", foo[0][10])
+        // console.log("foo[0][11] Oceania: ", foo[0][11])
+        
+            
     sankey.relayout();
     link.attr("d", path);
   }
-
 
 
 
