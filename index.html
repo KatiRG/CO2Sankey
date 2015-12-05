@@ -120,6 +120,10 @@ var div = d3.select("body").append("div")
     .enter().append("path")
       .attr("class", "link")
       .attr("d", path)
+      .attr("id", function(d,i){
+        d.id = i;
+        return "link-"+i;
+      })
       .style("stroke-width", function(d) { return Math.max(1, d.dy); })
       .style("stroke", function(d) {
 	       if (Europe.indexOf(d.target.name) != -1) return Europe_color 
@@ -156,6 +160,7 @@ var div = d3.select("body").append("div")
       .attr("transform", function(d) { 
         return "translate(" + d.x + "," + d.y + ")"; //positions the rectangles over the links
       })
+    .on("click",highlight_node_links)
     // .call(d3.behavior.drag() //Turn back on when you need to adjust a node
     //   .origin(function(d) { return d; })
     //   // .on("dragstart", function() { //Does not seem to be necessary...      
@@ -279,7 +284,51 @@ var div = d3.select("body").append("div")
     link.attr("d", path);
   }
 
+  // http://bl.ocks.org/git-ashish/8959771
+  function highlight_node_links(node,i){
 
+    var remainingNodes=[],
+        nextNodes=[];
+
+    var stroke_opacity = 0;
+    if( d3.select(this).attr("data-clicked") == "1" ){
+      d3.select(this).attr("data-clicked","0");
+      stroke_opacity = 0.2;
+    }else{
+      d3.select(this).attr("data-clicked","1");
+      stroke_opacity = 0.5;
+    }
+
+    var traverse = [{
+                      linkType : "sourceLinks",
+                      nodeType : "target"
+                    },{
+                      linkType : "targetLinks",
+                      nodeType : "source"
+                    }];
+
+    traverse.forEach(function(step){
+      node[step.linkType].forEach(function(link) {
+        remainingNodes.push(link[step.nodeType]);
+        highlight_link(link.id, stroke_opacity);
+      });
+
+      while (remainingNodes.length) {
+        nextNodes = [];
+        remainingNodes.forEach(function(node) {
+          node[step.linkType].forEach(function(link) {
+            nextNodes.push(link[step.nodeType]);
+            highlight_link(link.id, stroke_opacity);
+          });
+        });
+        remainingNodes = nextNodes;
+      }
+    });
+  }
+
+  function highlight_link(id,opacity){
+      d3.select("#link-"+id).style("stroke-opacity", opacity);
+  }
 
 });
  
