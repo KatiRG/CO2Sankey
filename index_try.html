@@ -441,7 +441,8 @@ button span{
           for (j=0; j<linkNum.length; j++){
             d3.select("#link-"+linkNum[j])
               .transition()
-              .style("stroke-opacity", 0);
+              .style("stroke-opacity", 0)
+              .duration(1000);
           }
 
           //nodes
@@ -449,7 +450,9 @@ button span{
             //nodeNum = "node-" + j;        
             d3.select("#node-"+j)
               .transition()
-              .style("display", "none");
+              .style("display", "none")
+              //.duration(100)
+              .delay(550);
           }
 
           // d3.select("#node-"+24)
