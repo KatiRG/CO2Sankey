@@ -59,48 +59,13 @@
     margin-left: -100px;*/
   }
 
-  .col1 {
-    position: fixed;
-    top: 18%;
-    left: 10%;
-  }
-  .col2 {
-    position: fixed;
-    top: 18%;
-    left: 40%;
-  }
-  .col3 {
-    position: fixed;
-    top: 18%;
-    left: 70%;
-  }
-
-  .chartpos {
-    position: fixed;
-    top: 25%;
-    left: 10%;
-  }
-
-  .container {
-    
-    overflow: auto;
-}
 
 
 </style>
 <body>
 
-  <div class="container">  
-  <div class="row">  
-    <div class="centered"><h1>CO2 Emissions 2014</h1></div>
-    <div class="col1"><h2>Emission Sources</h2></div>
-    <div class="col2"><h2>Regional Emissions</h2></div>
-    <div class="col3"><h2>Breakdown by Country</h2></div>
 
-  </div> <!--end row-->
-  <div class="row"> 
-
-    <p class="chartpos" id="chart">
+    <p id="chart">
      
     <script src="http://d3js.org/d3.v3.js"></script>
     <script src="sankey.js"></script>
@@ -390,8 +355,7 @@
       });
      
     </script>
-  </div> <!--end row-->  
-  </div> <!--end container div-->   
+
 
  
 </body>
