@@ -4,11 +4,7 @@
 <meta charset="utf-8">
 <title>SANKEY Experiment</title>
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
-
-
+<link href="lib/bootstrap-3.0.2-dist/css/bootstrap.css" rel="stylesheet">
 
 <style>
 
@@ -51,18 +47,32 @@
     border-radius: 8px;
   }
 
-  .centered {
-    position: fixed;
-    top: 1%;
-    left: 38%;
-    /*margin-top: -50px;
-    margin-left: -100px;*/
-  }
+/*http://code.stephenmorley.org/html-and-css/styling-buttons-with-css3/#borders*/
+/*button {
+  border        : 1px solid rgb(128,128,128);
+  border-radius : 4px;
+  background       : transparent;
+  font-size   : 2em;
+  cursor      : pointer;
+}
+button::-moz-focus-inner{
+  padding : 0;
+  border  : 0;
+}
+button span{
+  display : block;
+}*/
+
+
 
 
 
 </style>
 <body>
+  
+
+<input type="button" id="1" value="Collapse" style="background:transparent; font-size:2em; border-radius:4px;"
+       onclick="toggle(this);">
 
 
     <p id="chart">
@@ -112,6 +122,13 @@
       Africa_color = "#f39340";
       LatinAmerica_color = "#00A859";
       Oceania_color = "#a13769";
+
+      //for toggle button
+      allCountries = Asia.slice(1,Asia.length) + "," + NorthAmerica.slice(1,NorthAmerica.length) + "," 
+                   + Oceania.slice(1,Oceania.length) + "," 
+                   + Europe.slice(1,Europe.length) + "," + LatinAmerica.slice(1,LatinAmerica.length) + "," 
+                   + Africa.slice(1,Africa.length) + "," + MiddleEast.slice(1,MiddleEast.length);
+      console.log("allCountries: ", allCountries)             
 
       // load the data
       d3.json("emissions.json", function(error, graph) {
@@ -175,12 +192,23 @@
               });
        
       // add in the nodes
+        idx = 0;
         var node = svg.append("g").selectAll(".node")
             .data(graph.nodes)
           .enter().append("g")
             .attr("class", "node")
             .attr("transform", function(d) { 
               return "translate(" + d.x + "," + d.y + ")"; //positions the rectangles over the links
+            })
+            .attr("id", function(d,i){
+              if (d.name != "Africa") { //must exclude "Africa" but not "South Africa"
+                if (allCountries.indexOf(d.name) != -1) {
+                  nodeID = "node-" + idx;
+                  d.id = idx;
+                  idx++;                  
+                  return nodeID;
+                }
+              }
             })
           .on("click",highlight_node_links)
           // .call(d3.behavior.drag() //Turn back on when you need to adjust a node
@@ -353,6 +381,53 @@
         }
 
       });
+
+    function toggle(button) {
+      //links IDs to toggle
+      linkNum = d3.range(38,50).concat(d3.range(66,69), d3.range(72,73), d3.range(56,66), d3.range(69,72), 
+                  d3.range(35,38), d3.range(50,56));
+
+      if(document.getElementById("1").value=="Collapse"){
+        document.getElementById("1").value="Expand";
+
+        //links
+        for (j=0; j<linkNum.length; j++){
+          var linkName = "link-" + linkNum[j];
+          document.getElementById(linkName).style.display="None";  
+         }
+
+        //nodes
+        for (j=0; j<idx; j++){          
+          nodeNum = "node-" + j;        
+          document.getElementById(nodeNum).style.display="None";  
+        }
+      
+      }
+
+
+      else if(document.getElementById("1").value=="Expand"){
+        document.getElementById("1").value="Collapse";
+
+        //links
+        for (j=38; j<50; j++){
+          var linkName = "link-" + j;        
+          document.getElementById(linkName).style.display="block";  
+        }
+
+        //links
+        for (j=0; j<linkNum.length; j++){
+          var linkName = "link-" + linkNum[j];
+          document.getElementById(linkName).style.display="block";  
+        }
+
+        //nodes
+        for (j=0; j<idx; j++){          
+          nodeNum = "node-" + j;        
+          document.getElementById(nodeNum).style.display="block";  
+        }
+
+      }
+    }
      
     </script>
 
