@@ -446,22 +446,19 @@ button span{
           }
 
           //nodes
-          for (j=0; j<idx; j++){          
-            //nodeNum = "node-" + j;        
+          for (j=0; j<idx; j++){
             d3.select("#node-"+j)
+              .select("rect")
               .transition()
-              .style("display", "none")
-              //.duration(100)
-              .delay(550);
+              .style("opacity",0)
+              .delay(500);
+
+            d3.select("#node-"+j)
+              .select("text")
+              .transition()
+              .style("opacity",0)
+              .delay(500);
           }
-
-          // d3.select("#node-"+24)
-          //     .transition()
-          //     // .style("stroke-opacity", 0)
-          //     // .style("fill-opacity", 0)
-          //     // .style("fill", "none")
-          //     .style("display", "none");
-
       
         })   
      
