@@ -43,6 +43,12 @@ div.tooltip {
   border-color: #000;
   border-radius: 8px;
 }
+
+#bubbles {
+  position:relative;
+  left: 1260px;
+  top: -800px;
+}
  
 </style>
 <body>
@@ -51,8 +57,10 @@ div.tooltip {
 CO2 Emissions 2014: Sources / Regions / Countries
 </h3>
 
- 
-<p id="chart">
+<button id="transitionPerCapita">perCapita</button>
+
+<div id="chart"></div>
+<div id="bubbles"></div>
  
 <script src="d3.v3.min.js"></script>
 <script src="sankey.js"></script>
@@ -75,6 +83,22 @@ var svg = d3.select("#chart").append("svg")
   .append("g")
     .attr("transform", 
           "translate(" + margin.left + "," + margin.top + ")");
+
+var chart2 = d3.select("#bubbles")
+    .append("svg")   
+    .attr("width", (width + margin.left + margin.right) / 4)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var circle = chart2.append("circle")
+                        .attr("cx", 30)
+                         .attr("cy", 30)
+                         .attr("r", 20)
+                         .attr("fill", "#FF80AF")
+                         .attr("stroke", "#000000"); 
+
+                                  
  
 // Set the sankey diagram properties
 var sankey = d3.sankey()
@@ -134,7 +158,7 @@ GasFlaring_color = "#AEC7E8"
 Cement_color = "#666688"
 
 // load the data
-d3.json("emissions.json", function(error, graph) {
+d3.json("emissions_2levels.json", function(error, graph) {
  
     var nodeMap = {};
     graph.nodes.forEach(function(x) { nodeMap[x.name] = x; });
@@ -294,6 +318,16 @@ function highlight_node_links(node,i){
 function highlight_link(id,opacity){
       d3.select("#link-"+id).style("stroke-opacity", opacity);
 }
+
+d3.select("#transitionPerCapita")
+  .on("click", function(d,i) {
+    console.log("get ready!")
+
+    circle
+      .transition()
+      .attr("r", 37);
+
+})
 
 
 });
