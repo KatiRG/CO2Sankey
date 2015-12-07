@@ -5,7 +5,7 @@
 
 html {
   font-family: Arial;
-  color: #444;
+  color: #555;
 }
  
 .node rect {
@@ -16,8 +16,7 @@ html {
  
 .node text {
   pointer-events: none;
-  text-shadow: 0 1px 0 #fff;
-  fill: #444;
+  fill: #555;
 }
  
 .link {
@@ -127,11 +126,11 @@ Oceania_color = '#FFBFDA';
 SouthAmerica_color = '#FFA899';
 SouthCentralAmerica_color = '#9FD3C8';
 
-Coal_color = "#3B3131"
-Oil_color = "#886666"
-Gas_color = "#AEC7E8"
-GasFlaring_color = "#AEC7E8"
-Cement_color = "#666688"
+Coal_color = "#3B3131";
+Oil_color = "#886666";
+Gas_color = "#AEC7E8";
+GasFlaring_color = "#AEC7E8";
+Cement_color = "#666688";
 
 // load the data
 d3.json("emissions.json", function(error, graph) {
@@ -221,8 +220,8 @@ d3.json("emissions.json", function(error, graph) {
         else if (d.name == "Gas flaring") return GasFlaring_color
         else if (d.name == "Cement") return Cement_color
 	})
-      .style("stroke", function(d) { 
-		    return d3.rgb(d.color).darker(2); });
+      .style("stroke-width", "2px")
+      .style("stroke", "#555");
 
 // add the node tooltip
   node.on("mouseover", function(d) {      
@@ -302,7 +301,7 @@ function highlight_link(id,opacity){
 
 <p style='width: 600px;'>
 This Sankey diagram represents CO2 emission flows from five major sources (left column) and their proportional distibution over region (middle column) and country (right column, > 100 Mt CO2).
-This diagram shows the <b>latest 2014</b> figures available from Global Carbon Atlas (<a href='http://www.globalcarbonatlas.org'>http://www.globalcarbonatlas.org</a>).
+This diagram shows the <b>latest 2014 figures</b> available from Global Carbon Atlas (<a href='http://www.globalcarbonatlas.org'>http://www.globalcarbonatlas.org</a>).
 </p>
 
 <p style='width: 600px;'>
