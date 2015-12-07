@@ -74,7 +74,7 @@ button span{
 <input type="button" id="1" value="Collapse" style="background:transparent; font-size:2em; border-radius:4px;"
        onclick="toggle(this);">
 
-<button id="transition">Transition</button>     
+<button id="transition">Collapse</button>     
 
 
     <p id="chart">
@@ -129,8 +129,7 @@ button span{
       allCountries = Asia.slice(1,Asia.length) + "," + NorthAmerica.slice(1,NorthAmerica.length) + "," 
                    + Oceania.slice(1,Oceania.length) + "," 
                    + Europe.slice(1,Europe.length) + "," + LatinAmerica.slice(1,LatinAmerica.length) + "," 
-                   + Africa.slice(1,Africa.length) + "," + MiddleEast.slice(1,MiddleEast.length);
-      console.log("allCountries: ", allCountries)             
+                   + Africa.slice(1,Africa.length) + "," + MiddleEast.slice(1,MiddleEast.length);          
 
       // load the data
       d3.json("emissions.json", function(error, graph) {
@@ -433,6 +432,14 @@ button span{
 
     d3.select("#transition")
         .on("click", function(d,i) {
+          //define values to set
+          origOpacity = 1;
+          origStrokeOpacity = 0.2;
+
+
+          //toggle button text
+          buttonLabel = (d3.select(this).text() == "Collapse") ? "Expand" : "Collapse";
+          d3.select(this).text(buttonLabel);
 
           //links
           linkNum = d3.range(38,50).concat(d3.range(66,69), d3.range(72,73), d3.range(56,66), d3.range(69,72), 
@@ -441,7 +448,9 @@ button span{
           for (j=0; j<linkNum.length; j++){
             d3.select("#link-"+linkNum[j])
               .transition()
-              .style("stroke-opacity", 0)
+              .style("stroke-opacity", function() {               
+                return (buttonLabel == "Expand") ? 0 : origStrokeOpacity; 
+              })
               .duration(1000);
           }
 
@@ -450,13 +459,17 @@ button span{
             d3.select("#node-"+j)
               .select("rect")
               .transition()
-              .style("opacity",0)
+              .style("opacity", function() {
+                return (buttonLabel == "Expand") ? 0 : origOpacity;
+              })
               .delay(500);
 
             d3.select("#node-"+j)
               .select("text")
               .transition()
-              .style("opacity",0)
+              .style("opacity", function() {
+                return (buttonLabel == "Expand") ? 0 : origOpacity;
+              })
               .delay(500);
           }
       
