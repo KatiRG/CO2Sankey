@@ -69,10 +69,8 @@ button span{
 
 </style>
 <body>
-  
 
-<input type="button" id="1" value="Collapse" style="background:transparent; font-size:2em; border-radius:4px;"
-       onclick="toggle(this);">
+<button id="transition" style="background:transparent; font-size:1.2em; border-radius:4px;">Collapse</button>     
 
 
     <p id="chart">
@@ -127,8 +125,7 @@ button span{
       allCountries = Asia.slice(1,Asia.length) + "," + NorthAmerica.slice(1,NorthAmerica.length) + "," 
                    + Oceania.slice(1,Oceania.length) + "," 
                    + Europe.slice(1,Europe.length) + "," + LatinAmerica.slice(1,LatinAmerica.length) + "," 
-                   + Africa.slice(1,Africa.length) + "," + MiddleEast.slice(1,MiddleEast.length);
-      console.log("allCountries: ", allCountries)             
+                   + Africa.slice(1,Africa.length) + "," + MiddleEast.slice(1,MiddleEast.length);          
 
       // load the data
       d3.json("emissions.json", function(error, graph) {
@@ -310,8 +307,7 @@ button span{
                          d.x = d.x
                 ) + "," + (
                          d.y = displacements[j] //Math.max(0, Math.min(height - d.dy, d3.event.y))
-                  ) + ")");
-         
+                  ) + ")");         
           }
 
               // console.log("foo: ", foo)
@@ -328,12 +324,12 @@ button span{
               // console.log("foo[0][9] Latin Am: ", foo[0][9])
               // console.log("foo[0][10] Africa: ", foo[0][10])
               // console.log("foo[0][11] Oceania: ", foo[0][11])
-              
-                  
+                              
           sankey.relayout();
           link.attr("d", path);
         }
 
+      // highlight entire link path if a node is clicked
         // http://bl.ocks.org/git-ashish/8959771
         function highlight_node_links(node,i){
 
@@ -381,53 +377,52 @@ button span{
         }
 
       });
+    
+  // toggle between levels 2 and 3 with button click
+    d3.select("#transition")
+        .on("click", function(d,i) {
+          //save original values
+          origOpacity = 1;
+          origStrokeOpacity = 0.2;
 
-    function toggle(button) {
-      //links IDs to toggle
-      linkNum = d3.range(38,50).concat(d3.range(66,69), d3.range(72,73), d3.range(56,66), d3.range(69,72), 
-                  d3.range(35,38), d3.range(50,56));
+          //toggle button text
+          buttonLabel = (d3.select(this).text() == "Collapse") ? "Expand" : "Collapse";
+          d3.select(this).text(buttonLabel);
 
-      if(document.getElementById("1").value=="Collapse"){
-        document.getElementById("1").value="Expand";
+          //link ID numbers
+          linkNum = d3.range(38,50).concat(d3.range(66,69), d3.range(72,73), d3.range(56,66), 
+                    d3.range(69,72), d3.range(35,38), d3.range(50,56));
 
-        //links
-        for (j=0; j<linkNum.length; j++){
-          var linkName = "link-" + linkNum[j];
-          document.getElementById(linkName).style.display="None";  
-         }
+          //transition links
+          for (j=0; j<linkNum.length; j++){
+            d3.select("#link-"+linkNum[j])
+              .transition()
+              .style("stroke-opacity", function() {               
+                return (buttonLabel == "Expand") ? 0 : origStrokeOpacity; 
+              })
+              .duration(1000);
+          }
 
-        //nodes
-        for (j=0; j<idx; j++){          
-          nodeNum = "node-" + j;        
-          document.getElementById(nodeNum).style.display="None";  
-        }
+          //transition nodes
+          for (j=0; j<idx; j++){
+            d3.select("#node-"+j)
+              .select("rect")
+              .transition()
+              .style("opacity", function() {
+                return (buttonLabel == "Expand") ? 0 : origOpacity;
+              })
+              .delay(500);
+
+            d3.select("#node-"+j)
+              .select("text")
+              .transition()
+              .style("opacity", function() {
+                return (buttonLabel == "Expand") ? 0 : origOpacity;
+              })
+              .delay(500);
+          }
       
-      }
-
-
-      else if(document.getElementById("1").value=="Expand"){
-        document.getElementById("1").value="Collapse";
-
-        //links
-        for (j=38; j<50; j++){
-          var linkName = "link-" + j;        
-          document.getElementById(linkName).style.display="block";  
-        }
-
-        //links
-        for (j=0; j<linkNum.length; j++){
-          var linkName = "link-" + linkNum[j];
-          document.getElementById(linkName).style.display="block";  
-        }
-
-        //nodes
-        for (j=0; j<idx; j++){          
-          nodeNum = "node-" + j;        
-          document.getElementById(nodeNum).style.display="block";  
-        }
-
-      }
-    }
+        })   
      
     </script>
 
