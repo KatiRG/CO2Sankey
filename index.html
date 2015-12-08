@@ -80,7 +80,7 @@ ul {
 CO2 Emissions 2014: Sources / Regions / Countries
 </h3>
 
-<ul class="nytg-navigation">
+<ul class="nytg-navigation" style='position: absolute; left: 100px; top: 100px;'>
 <li id="TA" class="selected">MtCO2</li>
 <li id="TB">kgCO2/GDP</li>
 <li id="TC">tCO2/person</li>
@@ -92,8 +92,6 @@ CO2 Emissions 2014: Sources / Regions / Countries
 <script src="sankey.js"></script>
 <script>
   
-var units = "MtCO2";
- 
 var margin = {top: 10, right: 10, bottom: 10, left: 10},
     width = 1200 - margin.left - margin.right,
     height = 800 - margin.top - margin.bottom;
@@ -172,6 +170,7 @@ d3.select("#TA")
     .on("click", function() {
     	d3.selectAll(".nytg-navigation li").attr("class", "");
     	d3.select(this).attr("class", "selected");
+	units = "MtCO2";
 	d3.json("emissions1.json", function(error, graph) {
 		svg.selectAll("*").remove();
 		make(graph);
@@ -182,6 +181,7 @@ d3.select("#TB")
     .on("click", function() {
     	d3.selectAll(".nytg-navigation li").attr("class", "");
     	d3.select(this).attr("class", "selected");
+	units = "kgCO2/GDP";
 	d3.json("emissions2.json", function(error, graph) {
 		svg.selectAll("*").remove();
 		make(graph);
@@ -192,6 +192,7 @@ d3.select("#TC")
     .on("click", function() {
     	d3.selectAll(".nytg-navigation li").attr("class", "");
     	d3.select(this).attr("class", "selected");
+	units = "tCO2/person";
 	d3.json("emissions3.json", function(error, graph) {
 		svg.selectAll("*").remove();
 		make(graph);
