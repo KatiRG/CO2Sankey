@@ -5,19 +5,18 @@
 
 html {
   font-family: Arial;
-  color: #444;
+  color: #555;
 }
  
 .node rect {
   cursor: crosshair;
-  fill-opacity: .9;
+  fill-opacity: 1.0;
   shape-rendering: crispEdges;
 }
  
 .node text {
   pointer-events: none;
-  text-shadow: 0 1px 0 #fff;
-  fill: #444;
+  fill: #555;
 }
  
 .link {
@@ -28,7 +27,7 @@ html {
 }
  
 .link:hover {
-  stroke-opacity: .9 !important;
+  stroke-opacity: 1.0 !important;
 }
 
 div.tooltip {
@@ -43,7 +42,37 @@ div.tooltip {
   border-color: #000;
   border-radius: 8px;
 }
- 
+
+.nytg-navigation li.selected {
+    background: none repeat scroll 0 0 #e9e9e9;
+    border-color: #aaa;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2) inset;
+    color: #000;
+}
+.nytg-navigation li:first-of-type {
+    border-radius: 4px 0 0 4px;
+}
+.nytg-navigation li:last-of-type {
+    border-radius: 0 4px 4px 0;
+    border-right: 1px solid #ccc;
+}
+
+.nytg-navigation li {
+    background: none repeat scroll 0 0 #f9f9f9;
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    color: #999;
+    cursor: pointer;
+    float: left;
+    font-size: 14px;
+    margin: 0;
+    padding: 10px 18px;
+}
+ul {
+    list-style: outside none none;
+}
+
 </style>
 <body>
 
@@ -51,6 +80,11 @@ div.tooltip {
 CO2 Emissions 2014: Sources / Regions / Countries
 </h3>
 
+<ul class="nytg-navigation" style='position: absolute; left: 100px; top: 100px;'>
+<li id="TA" class="selected">MtCO2</li>
+<li id="TB">kgCO2/GDP</li>
+<li id="TC">tCO2/person</li>
+</ul>
  
 <p id="chart">
  
@@ -58,8 +92,6 @@ CO2 Emissions 2014: Sources / Regions / Countries
 <script src="sankey.js"></script>
 <script>
   
-var units = "Mt CO2";
- 
 var margin = {top: 10, right: 10, bottom: 10, left: 10},
     width = 1200 - margin.left - margin.right,
     height = 800 - margin.top - margin.bottom;
@@ -109,12 +141,12 @@ NorthAmerica = ['North America', 'Canada', 'Greenland', 'Mexico', 'Saint Pierre 
 Oceania = ['Oceania', 'Australia', 'Cook Islands', 'Micronesia (Federated States of)', 'Fiji', 'French Polynesia', 
     'Kiribati', 'Marshall Islands', 'Nauru', 'New Caledonia', 'New Zealand', 'Niue', 'Palau', 
     'Samoa', 'Solomon Islands', 'Tonga', 'Vanuatu', 'Wallis and Futuna Islands'];
-SouthCentralAmerica = ['South and Central America', 'Anguilla', 'Antigua and Barbuda', 'Aruba', 'Bahamas', 'Barbados', 'Belize', 'Bermuda', 'British Virgin Islands', 
+CentralAmerica = ['Central America', 'Anguilla', 'Antigua and Barbuda', 'Aruba', 'Bahamas', 'Barbados', 'Belize', 'Bermuda', 'British Virgin Islands', 
     'Cayman Islands', 'Costa Rica', 'Cuba', 'Dominica', 'Dominican Republic', 'El Salvador', 'Grenada', 'Guadeloupe',
     'Guatemala', 'Haiti', 'Honduras', 'Jamaica', 'Martinique', 'Montserrat', 'Netherlands Antilles', 'Nicaragua', 
     'Panama', 'Saint Helena', 'Saint Lucia', 'Saint Kitts and Nevis', 'Saint Vincent and the Grenadines', 
-    'Trinidad and Tobago', 'Turks and Caicos Islands',
-    'Argentina', 'Brazil', 'Chile', 'Colombia', 'Ecuador', 'Falkland Islands (Malvinas)', 
+    'Trinidad and Tobago', 'Turks and Caicos Islands'];
+SouthAmerica = ['South America', 'Argentina', 'Brazil', 'Chile', 'Colombia', 'Ecuador', 'Falkland Islands (Malvinas)', 
     'French Guiana', 'Guyana', 'Paraguay', 'Peru', 'Bolivia', 'Suriname', 'Uruguay', 'Venezuela'];
 
 Africa_color = '#FFD880';
@@ -125,17 +157,55 @@ MiddleEast_color = '#E0E67F';
 NorthAmerica_color = '#C399D9';
 Oceania_color = '#FFBFDA';
 SouthAmerica_color = '#FFA899';
-SouthCentralAmerica_color = '#9FD3C8';
+CentralAmerica_color = '#9FD3C8';
 
-Coal_color = "#3B3131"
-Oil_color = "#886666"
-Gas_color = "#AEC7E8"
-GasFlaring_color = "#AEC7E8"
-Cement_color = "#666688"
+Coal_color = "#3B3131";
+Oil_color = "#886666";
+Gas_color = "#AEC7E8";
+GasFlaring_color = "#AEC7E8";
+Cement_color = "#666688";
+
+// http://chimera.labs.oreilly.com/books/1230000000345/ch09.html#_changing_the_data
+d3.select("#TA")
+    .on("click", function() {
+    	d3.selectAll(".nytg-navigation li").attr("class", "");
+    	d3.select(this).attr("class", "selected");
+	units = "MtCO2";
+	d3.json("emissions_MtCO2.json", function(error, graph) {
+		svg.selectAll("*").remove();
+		make(graph);
+	})
+    });
+
+d3.select("#TB")
+    .on("click", function() {
+    	d3.selectAll(".nytg-navigation li").attr("class", "");
+    	d3.select(this).attr("class", "selected");
+	units = "kgCO2/GDP";
+	d3.json("emissions_kgCO2_GDP.json", function(error, graph) {
+		svg.selectAll("*").remove();
+		make(graph);
+	})
+    });
+
+d3.select("#TC")
+    .on("click", function() {
+    	d3.selectAll(".nytg-navigation li").attr("class", "");
+    	d3.select(this).attr("class", "selected");
+	units = "tCO2/person";
+	d3.json("emissions_tCO2_person.json", function(error, graph) {
+		svg.selectAll("*").remove();
+		make(graph);
+	})
+    });
 
 // load the data
-d3.json("emissions.json", function(error, graph) {
+units = "MtCO2";
+d3.json("emissions_MtCO2.json", function(error, graph) {
+	make(graph);
+});
  
+function make(graph){
     var nodeMap = {};
     graph.nodes.forEach(function(x) { nodeMap[x.name] = x; });
     graph.links = graph.links.map(function(x) {
@@ -172,7 +242,8 @@ d3.json("emissions.json", function(error, graph) {
       .style("stroke", function(d) {
 	       if (Europe.indexOf(d.target.name) != -1) return Europe_color 
                else if (NorthAmerica.indexOf(d.target.name) != -1) return NorthAmerica_color
-               else if (SouthCentralAmerica.indexOf(d.target.name) != -1) return SouthCentralAmerica_color
+               else if (CentralAmerica.indexOf(d.target.name) != -1) return CentralAmerica_color
+               else if (SouthAmerica.indexOf(d.target.name) != -1) return SouthAmerica_color
                else if (Asia.indexOf(d.target.name) != -1) return Asia_color
                else if (MiddleEast.indexOf(d.target.name) != -1) return MiddleEast_color
                else if (Africa.indexOf(d.target.name) != -1) return Africa_color
@@ -210,7 +281,8 @@ d3.json("emissions.json", function(error, graph) {
       .style("fill", function(d) { 
 	if (Europe.indexOf(d.name) != -1) return Europe_color 
         else if (NorthAmerica.indexOf(d.name) != -1) return NorthAmerica_color
-        else if (SouthCentralAmerica.indexOf(d.name) != -1) return SouthCentralAmerica_color
+        else if (CentralAmerica.indexOf(d.name) != -1) return CentralAmerica_color
+        else if (SouthAmerica.indexOf(d.name) != -1) return SouthAmerica_color
         else if (Asia.indexOf(d.name) != -1) return Asia_color
         else if (MiddleEast.indexOf(d.name) != -1) return MiddleEast_color
         else if (Africa.indexOf(d.name) != -1) return Africa_color
@@ -221,8 +293,8 @@ d3.json("emissions.json", function(error, graph) {
         else if (d.name == "Gas flaring") return GasFlaring_color
         else if (d.name == "Cement") return Cement_color
 	})
-      .style("stroke", function(d) { 
-		    return d3.rgb(d.color).darker(2); });
+      .style("stroke-width", "2px")
+      .style("stroke", "#555");
 
 // add the node tooltip
   node.on("mouseover", function(d) {      
@@ -261,7 +333,7 @@ function highlight_node_links(node,i){
       stroke_opacity = 0.5;
     }else{
       d3.select(this).attr("data-clicked","1");
-      stroke_opacity = 0.9;
+      stroke_opacity = 1.0;
     }
 
     var traverse = [{
@@ -296,13 +368,13 @@ function highlight_link(id,opacity){
 }
 
 
-});
+}
  
 </script>
 
 <p style='width: 600px;'>
 This Sankey diagram represents CO2 emission flows from five major sources (left column) and their proportional distibution over region (middle column) and country (right column, > 100 Mt CO2).
-This diagram shows the <b>latest 2014</b> figures available from Global Carbon Atlas (<a href='http://www.globalcarbonatlas.org'>http://www.globalcarbonatlas.org</a>).
+This diagram shows the <b>latest 2014 figures</b> available from Global Carbon Atlas at <a href='http://www.globalcarbonatlas.org'>http://www.globalcarbonatlas.org</a>.
 </p>
 
 <p style='width: 600px;'>
@@ -311,7 +383,7 @@ This diagram shows the <b>latest 2014</b> figures available from Global Carbon A
 </i>
 </p>
 
-<p>Created by <span title="Climate and Environment Sciences Laboratory" style="font-weight:bold;">LSCE</span> &nbsp;<img src="LSCE_Icon.png" title="Climate and Environment Sciences Laboratory"/>&nbsp;&nbsp;Version 1.0 - 2015/12/07<br>
+<p>Created by <span title="Climate and Environment Sciences Laboratory" style="font-weight:bold;">LSCE</span> &nbsp;<img src="LSCE_Icon.png" title="Climate and Environment Sciences Laboratory"/>&nbsp;&nbsp;Version 1.1 - 2015/12/08<br>
 Authors: Cathy Nangini, Patrick Brockmann<br>
 Thanks to Mike Bostock, Ashish Singh
 </p>
