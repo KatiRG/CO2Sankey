@@ -141,12 +141,12 @@ NorthAmerica = ['North America', 'Canada', 'Greenland', 'Mexico', 'Saint Pierre 
 Oceania = ['Oceania', 'Australia', 'Cook Islands', 'Micronesia (Federated States of)', 'Fiji', 'French Polynesia', 
     'Kiribati', 'Marshall Islands', 'Nauru', 'New Caledonia', 'New Zealand', 'Niue', 'Palau', 
     'Samoa', 'Solomon Islands', 'Tonga', 'Vanuatu', 'Wallis and Futuna Islands'];
-SouthCentralAmerica = ['South and Central America', 'Anguilla', 'Antigua and Barbuda', 'Aruba', 'Bahamas', 'Barbados', 'Belize', 'Bermuda', 'British Virgin Islands', 
+CentralAmerica = ['Central America', 'Anguilla', 'Antigua and Barbuda', 'Aruba', 'Bahamas', 'Barbados', 'Belize', 'Bermuda', 'British Virgin Islands', 
     'Cayman Islands', 'Costa Rica', 'Cuba', 'Dominica', 'Dominican Republic', 'El Salvador', 'Grenada', 'Guadeloupe',
     'Guatemala', 'Haiti', 'Honduras', 'Jamaica', 'Martinique', 'Montserrat', 'Netherlands Antilles', 'Nicaragua', 
     'Panama', 'Saint Helena', 'Saint Lucia', 'Saint Kitts and Nevis', 'Saint Vincent and the Grenadines', 
-    'Trinidad and Tobago', 'Turks and Caicos Islands',
-    'Argentina', 'Brazil', 'Chile', 'Colombia', 'Ecuador', 'Falkland Islands (Malvinas)', 
+    'Trinidad and Tobago', 'Turks and Caicos Islands'];
+SouthAmerica = ['South America', 'Argentina', 'Brazil', 'Chile', 'Colombia', 'Ecuador', 'Falkland Islands (Malvinas)', 
     'French Guiana', 'Guyana', 'Paraguay', 'Peru', 'Bolivia', 'Suriname', 'Uruguay', 'Venezuela'];
 
 Africa_color = '#FFD880';
@@ -157,7 +157,7 @@ MiddleEast_color = '#E0E67F';
 NorthAmerica_color = '#C399D9';
 Oceania_color = '#FFBFDA';
 SouthAmerica_color = '#FFA899';
-SouthCentralAmerica_color = '#9FD3C8';
+CentralAmerica_color = '#9FD3C8';
 
 Coal_color = "#3B3131";
 Oil_color = "#886666";
@@ -171,7 +171,7 @@ d3.select("#TA")
     	d3.selectAll(".nytg-navigation li").attr("class", "");
     	d3.select(this).attr("class", "selected");
 	units = "MtCO2";
-	d3.json("emissions1.json", function(error, graph) {
+	d3.json("emissions_MtCO2.json", function(error, graph) {
 		svg.selectAll("*").remove();
 		make(graph);
 	})
@@ -182,7 +182,7 @@ d3.select("#TB")
     	d3.selectAll(".nytg-navigation li").attr("class", "");
     	d3.select(this).attr("class", "selected");
 	units = "kgCO2/GDP";
-	d3.json("emissions2.json", function(error, graph) {
+	d3.json("emissions_kgCO2_GDP.json", function(error, graph) {
 		svg.selectAll("*").remove();
 		make(graph);
 	})
@@ -193,14 +193,15 @@ d3.select("#TC")
     	d3.selectAll(".nytg-navigation li").attr("class", "");
     	d3.select(this).attr("class", "selected");
 	units = "tCO2/person";
-	d3.json("emissions3.json", function(error, graph) {
+	d3.json("emissions_tCO2_person.json", function(error, graph) {
 		svg.selectAll("*").remove();
 		make(graph);
 	})
     });
 
 // load the data
-d3.json("emissions1.json", function(error, graph) {
+units = "MtCO2";
+d3.json("emissions_MtCO2.json", function(error, graph) {
 	make(graph);
 });
  
@@ -241,7 +242,8 @@ function make(graph){
       .style("stroke", function(d) {
 	       if (Europe.indexOf(d.target.name) != -1) return Europe_color 
                else if (NorthAmerica.indexOf(d.target.name) != -1) return NorthAmerica_color
-               else if (SouthCentralAmerica.indexOf(d.target.name) != -1) return SouthCentralAmerica_color
+               else if (CentralAmerica.indexOf(d.target.name) != -1) return CentralAmerica_color
+               else if (SouthAmerica.indexOf(d.target.name) != -1) return SouthAmerica_color
                else if (Asia.indexOf(d.target.name) != -1) return Asia_color
                else if (MiddleEast.indexOf(d.target.name) != -1) return MiddleEast_color
                else if (Africa.indexOf(d.target.name) != -1) return Africa_color
@@ -279,7 +281,8 @@ function make(graph){
       .style("fill", function(d) { 
 	if (Europe.indexOf(d.name) != -1) return Europe_color 
         else if (NorthAmerica.indexOf(d.name) != -1) return NorthAmerica_color
-        else if (SouthCentralAmerica.indexOf(d.name) != -1) return SouthCentralAmerica_color
+        else if (CentralAmerica.indexOf(d.name) != -1) return CentralAmerica_color
+        else if (SouthAmerica.indexOf(d.name) != -1) return SouthAmerica_color
         else if (Asia.indexOf(d.name) != -1) return Asia_color
         else if (MiddleEast.indexOf(d.name) != -1) return MiddleEast_color
         else if (Africa.indexOf(d.name) != -1) return Africa_color
