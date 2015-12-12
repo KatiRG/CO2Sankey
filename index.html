@@ -84,6 +84,7 @@ CO2 Emissions 2014: Sources / Regions / Countries
 <li id="TA" class="selected">MtCO2</li>
 <li id="TB">kgCO2/GDP</li>
 <li id="TC">tCO2/person</li>
+<li id="TD">test</li>
 </ul>
  
 <p id="chart">
@@ -165,6 +166,21 @@ Gas_color = "#AEC7E8";
 GasFlaring_color = "#AEC7E8";
 Cement_color = "#666688";
 
+testFlag = 0;
+
+//test saving the object for MtCO2 and per capita data
+d3.json("emissions_MtCO2.json", function(error, graph) {
+  graph1 = graph;
+  console.log("graph1: ", graph1)
+})
+
+d3.json("emissions_tCO2_person.json", function(error, graph) {
+  graph3 = graph;
+  console.log("graph3: ", graph3)
+  sankeyObj3 = makeSankeyObj(graph3);
+  console.log("sankeyObj3: ", sankeyObj3)
+})
+
 // http://chimera.labs.oreilly.com/books/1230000000345/ch09.html#_changing_the_data
 d3.select("#TA")
     .on("click", function() {
@@ -199,13 +215,25 @@ d3.select("#TC")
 	})
     });
 
+d3.select("#TD")
+    .on("click", function() {
+      d3.selectAll(".nytg-navigation li").attr("class", "");
+      d3.select(this).attr("class", "selected");
+  units = "tCO2/person";
+  d3.json("emissions_MtCO2.json", function(error, graph) {
+    svg.selectAll("*").remove();
+    testFlag = 1;
+    make(graph);
+  })
+    });    
+
 // load the data
 units = "MtCO2";
 d3.json("emissions_MtCO2.json", function(error, graph) {
 	make(graph);
 });
- 
-function make(graph){
+
+function makeSankeyObj(graph){
     var nodeMap = {};
     graph.nodes.forEach(function(x) { nodeMap[x.name] = x; });
     graph.links = graph.links.map(function(x) {
@@ -222,6 +250,31 @@ function make(graph){
       .nodes(graph.nodes)
       .links(graph.links)
       .layout(32);
+
+  return sankey;    
+}
+ 
+function make(graph){
+  console.log("testFlag: ", testFlag)
+
+  var nodeMap = {};
+  graph.nodes.forEach(function(x) { nodeMap[x.name] = x; });
+  graph.links = graph.links.map(function(x) {
+    return {
+      source: nodeMap[x.source],
+      target: nodeMap[x.target],
+      value: x.value
+    };
+  });
+
+  graph.nodes.sort(function (a,b) {return d3.descending(a.value, b.value); });
+ 
+  sankey
+      .nodes(graph.nodes)
+      .links(graph.links)
+      .layout(32);
+
+  console.log("sankey: ", sankey)    
 
 // tooltip div
   var div = d3.select("body").append("div")   
@@ -248,7 +301,7 @@ function make(graph){
                else if (MiddleEast.indexOf(d.target.name) != -1) return MiddleEast_color
                else if (Africa.indexOf(d.target.name) != -1) return Africa_color
                else if (Oceania.indexOf(d.target.name) != -1) return Oceania_color
-	})
+	     })
       .sort(function(a, b) { return b.dy - a.dy; });
  
 // add the link tooltip
@@ -272,7 +325,10 @@ function make(graph){
       .attr("class", "node")
       .attr("transform", function(d) { 
 	       return "translate(" + d.x + "," + d.y + ")"; })
-    .on("click",highlight_node_links);
+    .on("click",highlight_node_links)
+    .call(function () {
+      if (testFlag === 1) layoutTransition();
+    });
  
 // add the rectangles for the nodes
   node.append("rect")
@@ -322,7 +378,7 @@ function make(graph){
       .attr("text-anchor", "start");
  
 // http://bl.ocks.org/git-ashish/8959771
-function highlight_node_links(node,i){
+  function highlight_node_links(node,i){
 
     var remainingNodes=[],
         nextNodes=[];
@@ -363,10 +419,83 @@ function highlight_node_links(node,i){
     });
   }
 
-function highlight_link(id,opacity){
-      d3.select("#link-"+id).style("stroke-opacity", opacity);
-}
+  function highlight_link(id,opacity){
+    d3.select("#link-"+id).style("stroke-opacity", opacity);
+  }
 
+  // manually customize node position
+  function layoutTransition() {
+    //http://stackoverflow.com/questions/10337640/how-to-access-the-dom-element-that-correlates-to-a-d3-svg-object
+    //displacements in order of foo nodes (foo[0][j])
+    var displacements = [56,299,485,647,766, 55, 746, 307, 490, 612, 677, 429];
+    var foo = d3.selectAll("g.node");
+    //for (j=0; j < displacements.length; j++) {
+    j=12;
+      pickNode = foo[0][j]; //equals "this" in d3.behavior.drag()...on("dragstart")
+      d = graph.nodes[j];
+      d3.select(pickNode)
+        .transition()
+        .attr("transform", 
+                  "translate(" + (
+                         d.x = d.x
+                ) + "," + (
+                         d.y = 22  //displacements[j]
+                  ) + ")");         
+    //}
+              // console.log("foo: ", foo)
+              // console.log("foo[0][0] coal: ", foo[0][0])
+              // console.log("foo[0][1] oil: ", foo[0][1])
+              // console.log("foo[0][2] gas: ", foo[0][2])
+              // console.log("foo[0][3] cement: ", foo[0][3])
+              // console.log("foo[0][4] gas Flaring: ", foo[0][4])
+              // console.log("foo[0][5] Asia: ", foo[0][5])
+              // console.log("foo[0][6] Mid East: ", foo[0][6])
+              // console.log("foo[0][7] North Am: ", foo[0][7])
+              // console.log("foo[0][8] Europe: ", foo[0][8])
+              // console.log("foo[0][9] Latin Am: ", foo[0][9])
+              // console.log("foo[0][10] Africa: ", foo[0][10])
+              // console.log("foo[0][11] Oceania: ", foo[0][11])
+                              
+          sankey.relayout();
+          link.attr("d", path);
+  }
+
+  // if (testFlag == 1) {
+  //   console.log("get ready!")
+
+  //   //Create a lookup object to find an object in an array of objects
+  //   var lookup = {}, lookup_idx = {};
+  //   for (var i = 0, len = sankey.layout().nodes().length; i < len; i++) {
+  //       lookup[sankey.layout().nodes()[i].name] = sankey.layout().nodes()[i];
+  //       lookup_idx[sankey.layout().nodes()[i].name] = i;
+  //   }
+  //   console.log("lookup[China]: ", lookup["China"] )
+  //   console.log("lookup_idx[China]: ", lookup_idx["China"] )
+
+  //   nodeChina = lookup["China"];
+
+  //   // d3.select(node[12]) //china
+  //   //   .attr("transform", "translate(" + (
+  //   //                      d.x = d.x
+  //   //             ) + "," + (
+  //   //                      d.y = 22
+  //   //               ) + ")"
+  //   //   );   
+
+  //     var foo = d3.selectAll("g.node");
+  //     j=12;
+  //     pickNode = foo[0][j]; //equals "this" in d3.behavior.drag()...on("dragstart")
+  //     d = graph.nodes[j];
+  //     d3.select(pickNode).attr("transform", 
+  //                 "translate(" + (
+  //                        d.x = d.x
+  //               ) + "," + (
+  //                        d.y = displacements[j] //Math.max(0, Math.min(height - d.dy, d3.event.y))
+  //                 ) + ")");     
+
+  // }  
+
+  testFlag = 0;
 
 }
  
