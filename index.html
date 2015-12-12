@@ -319,19 +319,20 @@ function make(graph){
         });
  
 // add in the nodes
-  var node = svg.append("g").selectAll(".node")
+  var node = svg.append("g")
+      .selectAll(".node")
       .data(graph.nodes)
     .enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { 
 	       return "translate(" + d.x + "," + d.y + ")"; })
     .on("click",highlight_node_links)
-    .call(function () {
-      if (testFlag === 1) layoutTransition();
+    .call(function () {      
+      if (testFlag === 1) nodeTransition();
     });
  
 // add the rectangles for the nodes
-  node.append("rect")
+  node.append("rect").attr("id", "rectId")
       .attr("height", function(d) { return d.dy; })
       .attr("width", sankey.nodeWidth())
       .style("fill", function(d) { 
@@ -424,16 +425,30 @@ function make(graph){
   }
 
   // manually customize node position
-  function layoutTransition() {
+  function nodeTransition() {
+    console.log("in nodeTransition")
+
 
     //http://stackoverflow.com/questions/10337640/how-to-access-the-dom-element-that-correlates-to-a-d3-svg-object
-    //displacements in order of foo nodes (foo[0][j])
-    var displacements = [56,299,485,647,766, 55, 746, 307, 490, 612, 677, 429];
     var foo = d3.selectAll("g.node");
+    
+    //WORKS IN CONSOLE BUT NOT HERE FOR SOME REASON!!!
+    //d3.select(foo[0][0]).select("rect").attr("height", "66")
+
+    //try http://stackoverflow.com/questions/29278107/d3js-how-to-select-nth-element-of-a-group
+    // var group = document.querySelector('#groupOfRects');
+    // var rectNodes = group.getElementsByTagName('rect');
+    // console.log("rectNodes: ", rectNodes)
+
+    // console.log("svg: ", svg.selectAll(".node"));
+
+    dd = graph3.nodes;
+    d3.selectAll("g.node").each( function(d, i){
+
+      if (i < 5) d.dy = dd[i].dy;
+    })
 
     //transition sources
-    d3.select(foo[0][0]).select("rect").attr("height", "66")
-    
     numSources = 5;
     for (j=0; j < numSources; j++) {
       pickNode = foo[0][j]; //equals "this" in d3.behavior.drag()...on("dragstart")
@@ -451,9 +466,9 @@ function make(graph){
                          d.x = d.x
                 ) + "," + (
                          d.y = dnew.y  //displacements[j]
-                  ) + ")")
-        .select("rect")
-          .attr("height", function(d) { return dnew.dy; });
+                  ) + ")");
+        // .select("rect")
+        //   .attr("height", function(d) { return dnew.dy; });
 
       
 
