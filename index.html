@@ -425,10 +425,48 @@ function make(graph){
 
   // manually customize node position
   function layoutTransition() {
+
     //http://stackoverflow.com/questions/10337640/how-to-access-the-dom-element-that-correlates-to-a-d3-svg-object
     //displacements in order of foo nodes (foo[0][j])
     var displacements = [56,299,485,647,766, 55, 746, 307, 490, 612, 677, 429];
     var foo = d3.selectAll("g.node");
+
+    //transition sources
+    d3.select(foo[0][0]).select("rect").attr("height", "66")
+    
+    numSources = 5;
+    for (j=0; j < numSources; j++) {
+      pickNode = foo[0][j]; //equals "this" in d3.behavior.drag()...on("dragstart")
+      d = graph.nodes[j];
+      console.log("d: ", d)
+
+      dnew = graph3.nodes[j];
+      console.log("dnew: ", dnew)
+
+      //apply y coord of new object
+      d3.select(pickNode)
+        .transition()
+        .attr("transform", 
+                  "translate(" + (
+                         d.x = d.x
+                ) + "," + (
+                         d.y = dnew.y  //displacements[j]
+                  ) + ")")
+        .select("rect")
+          .attr("height", function(d) { return dnew.dy; });
+
+      
+
+      sankey.relayout();
+      link.attr("d", path);
+    }
+
+
+
+    //transition rect heights
+    //d3.select(pickNode).select("rect").attr("height", "10")
+
+
     //for (j=0; j < displacements.length; j++) {
     j=12;
       pickNode = foo[0][j]; //equals "this" in d3.behavior.drag()...on("dragstart")
@@ -472,28 +510,7 @@ function make(graph){
   //   console.log("lookup[China]: ", lookup["China"] )
   //   console.log("lookup_idx[China]: ", lookup_idx["China"] )
 
-  //   nodeChina = lookup["China"];
-
-  //   // d3.select(node[12]) //china
-  //   //   .attr("transform", "translate(" + (
-  //   //                      d.x = d.x
-  //   //             ) + "," + (
-  //   //                      d.y = 22
-  //   //               ) + ")"
-  //   //   );   
-
-  //     var foo = d3.selectAll("g.node");
-  //     j=12;
-  //     pickNode = foo[0][j]; //equals "this" in d3.behavior.drag()...on("dragstart")
-  //     d = graph.nodes[j];
-  //     d3.select(pickNode).attr("transform", 
-  //                 "translate(" + (
-  //                        d.x = d.x
-  //               ) + "," + (
-  //                        d.y = displacements[j] //Math.max(0, Math.min(height - d.dy, d3.event.y))
-  //                 ) + ")");     
-
-  // }  
+  //   nodeChina = lookup["China"]; 
 
   testFlag = 0;
 
