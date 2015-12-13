@@ -179,7 +179,10 @@ d3.json("emissions_tCO2_person.json", function(error, graph) {
   console.log("graph3: ", graph3)
   sankeyObj3 = makeSankeyObj(graph3);
   console.log("sankeyObj3: ", sankeyObj3)
+  path3 = sankeyObj3.link();
 })
+
+
 
 // http://chimera.labs.oreilly.com/books/1230000000345/ch09.html#_changing_the_data
 d3.select("#TA")
@@ -215,7 +218,7 @@ d3.select("#TC")
 	})
     });
 
-d3.select("#TD")
+d3.select("#TD") //test button
     .on("click", function() {
       d3.selectAll(".nytg-navigation li").attr("class", "");
       d3.select(this).attr("class", "selected");
@@ -288,9 +291,9 @@ function make(graph){
       .attr("class", "link")
       .attr("d", path)
       .attr("id", function(d,i){
-		d.id = i;
-		return "link-"+i;
-	})
+    		d.id = i;
+    		return "link-"+i;
+    	})
       .style("stroke-width", function(d) { return Math.max(1, d.dy); })
       .style("stroke", function(d) {
 	       if (Europe.indexOf(d.target.name) != -1) return Europe_color 
@@ -303,6 +306,33 @@ function make(graph){
                else if (Oceania.indexOf(d.target.name) != -1) return Oceania_color
 	     })
       .sort(function(a, b) { return b.dy - a.dy; });
+
+  if (testFlag === 1) { //test button has been clicked
+
+    //http://bost.ocks.org/mike/transition/
+    var bar = svg.selectAll(".link")
+                 .data(graph3.links);
+
+    bar.enter().append("path")
+        .attr("class", "bar")
+       
+
+    bar.transition()
+       .duration(1000).delay(100)
+       .attr("d", path3)
+       .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+       .style("stroke", function(d) {
+         if (Europe.indexOf(d.target.name) != -1) return Europe_color 
+               else if (NorthAmerica.indexOf(d.target.name) != -1) return NorthAmerica_color
+               else if (CentralAmerica.indexOf(d.target.name) != -1) return CentralAmerica_color
+               else if (SouthAmerica.indexOf(d.target.name) != -1) return SouthAmerica_color
+               else if (Asia.indexOf(d.target.name) != -1) return Asia_color
+               else if (MiddleEast.indexOf(d.target.name) != -1) return MiddleEast_color
+               else if (Africa.indexOf(d.target.name) != -1) return Africa_color
+               else if (Oceania.indexOf(d.target.name) != -1) return Oceania_color
+       })
+       .sort(function(a, b) { return b.dy - a.dy; });
+  }    
  
 // add the link tooltip
   link.on("mouseover", function(d) {      
@@ -327,12 +357,26 @@ function make(graph){
       .attr("transform", function(d) { 
 	       return "translate(" + d.x + "," + d.y + ")"; })
     .on("click",highlight_node_links)
-    .call(function () {      
-      if (testFlag === 1) nodeTransition();
+    .call(d3.behavior.drag() //Turn back on when you need to adjust a node
+      .origin(function(d) { return d; })
+        // .on("dragstart", function() { //Does not seem to be necessary...      
+        // this.parentNode.appendChild(this); })
+      .on("drag", dragmove)
+    )
+    .call(function () {
+      //if (testFlag === 1) nodeTransition();
     });
+
+    if (testFlag === 1) { //test button has been clicked
+      node.transition().duration(1000).delay(100)
+        .attr("transform", function(d, i) { 
+          d_new = graph3.nodes[i];
+           return "translate(" + d.x + "," + d_new.y + ")"; });
+    }
+
  
 // add the rectangles for the nodes
-  node.append("rect").attr("id", "rectId")
+  var rect = node.append("rect").attr("id", "rectId")
       .attr("height", function(d) { return d.dy; })
       .attr("width", sankey.nodeWidth())
       .style("fill", function(d) { 
@@ -352,6 +396,15 @@ function make(graph){
 	})
       .style("stroke-width", "2px")
       .style("stroke", "#555");
+
+  if (testFlag === 1) { //test button has been clicked
+    rect.transition().delay(1000)
+        .attr("height", function(d, i) { 
+          d_new = graph3.nodes[i];
+          return d_new.dy; 
+        });
+  }
+    
 
 // add the node tooltip
   node.on("mouseover", function(d) {      
@@ -377,6 +430,25 @@ function make(graph){
     .filter(function(d) { return d.x < width / 2; })
       .attr("x", 6 + sankey.nodeWidth())
       .attr("text-anchor", "start");
+
+// the function for moving the nodes
+  function dragmove(d) {
+    console.log("this: ", this)
+
+    d3.select(this).attr("transform", 
+      "translate(" + (
+            d.x = d.x
+          ) + "," + (
+            d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
+      ) + ")");
+      
+      console.log("link: ", link)
+      console.log("their link[0][0] BEFORE: ", link[0][0])
+      console.log("link.attr(d, path): ", link.attr("d", path))
+      sankey.relayout();
+      link.attr("d", path);
+      console.log("their link[0][0] AFTER: ", link[0][0])
+  }      
  
 // http://bl.ocks.org/git-ashish/8959771
   function highlight_node_links(node,i){
@@ -431,6 +503,39 @@ function make(graph){
 
     //http://stackoverflow.com/questions/10337640/how-to-access-the-dom-element-that-correlates-to-a-d3-svg-object
     var foo = d3.selectAll("g.node");
+    var foopath = d3.selectAll("path");
+
+    console.log("select path: ", svg.select(".link"))
+
+    //http://bost.ocks.org/mike/transition/
+    var bar = svg.selectAll(".link")
+                 .data(graph3.links);
+
+    bar.enter().append("path")
+        .attr("class", "bar")
+       
+
+    bar.transition()
+       .delay(1000)
+       .attr("d", path3)
+       .sort(function(a, b) { return b.dy - a.dy; });
+
+    
+
+
+    // var link3 = svg.select("g").selectAll(".link")
+    //   .data(graph3.links)
+    // .enter().append("path")
+    //   .attr("class", "link")
+    //   .transition()
+    //   .delay(1000)
+    //   .attr("d", path3)
+    //   .attr("id", function(d,i){
+    //     d.id = i;
+    //     return "link3-"+i;
+    //   })
+    //   .sort(function(a, b) { return b.dy - a.dy; });
+
     
     //WORKS IN CONSOLE BUT NOT HERE FOR SOME REASON!!!
     //d3.select(foo[0][0]).select("rect").attr("height", "66")
@@ -442,9 +547,10 @@ function make(graph){
 
     // console.log("svg: ", svg.selectAll(".node"));
 
+    //rect height
     dd = graph3.nodes;
     d3.selectAll("g.node").each( function(d, i){
-
+      //sources only, for now
       if (i < 5) d.dy = dd[i].dy;
     })
 
@@ -455,8 +561,8 @@ function make(graph){
       d = graph.nodes[j];
       console.log("d: ", d)
 
-      dnew = graph3.nodes[j];
-      console.log("dnew: ", dnew)
+      d_new = graph3.nodes[j];
+      console.log("d_new: ", d_new)
 
       //apply y coord of new object
       d3.select(pickNode)
@@ -465,11 +571,17 @@ function make(graph){
                   "translate(" + (
                          d.x = d.x
                 ) + "," + (
-                         d.y = dnew.y  //displacements[j]
+                         d.y = d_new.y
                   ) + ")");
-        // .select("rect")
-        //   .attr("height", function(d) { return dnew.dy; });
+        
+      // //apply new link path
+      // pickLink = foopath[0][j]
+      // dp = graph.links;
+      // dp_new = graph3.links[j];
 
+      // // d3.select(pickLink)
+      // //   .transition()
+      // //   .attr("d" , 
       
 
       sankey.relayout();
