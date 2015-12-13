@@ -296,6 +296,7 @@ function make(graph){
     	})
       .style("stroke-width", function(d) { return Math.max(1, d.dy); })
       .style("stroke", function(d) {
+        console.log("d in orig: ", d)
 	       if (Europe.indexOf(d.target.name) != -1) return Europe_color 
                else if (NorthAmerica.indexOf(d.target.name) != -1) return NorthAmerica_color
                else if (CentralAmerica.indexOf(d.target.name) != -1) return CentralAmerica_color
@@ -305,34 +306,9 @@ function make(graph){
                else if (Africa.indexOf(d.target.name) != -1) return Africa_color
                else if (Oceania.indexOf(d.target.name) != -1) return Oceania_color
 	     })
-      .sort(function(a, b) { return b.dy - a.dy; });
-
-  if (testFlag === 1) { //test button has been clicked
-
-    //http://bost.ocks.org/mike/transition/
-    var bar = svg.selectAll(".link")
-                 .data(graph3.links);
-
-    bar.enter().append("path")
-        .attr("class", "bar")
-       
-
-    bar.transition()
-       .duration(1000).delay(100)
-       .attr("d", path3)
-       .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-       .style("stroke", function(d) {
-         if (Europe.indexOf(d.target.name) != -1) return Europe_color 
-               else if (NorthAmerica.indexOf(d.target.name) != -1) return NorthAmerica_color
-               else if (CentralAmerica.indexOf(d.target.name) != -1) return CentralAmerica_color
-               else if (SouthAmerica.indexOf(d.target.name) != -1) return SouthAmerica_color
-               else if (Asia.indexOf(d.target.name) != -1) return Asia_color
-               else if (MiddleEast.indexOf(d.target.name) != -1) return MiddleEast_color
-               else if (Africa.indexOf(d.target.name) != -1) return Africa_color
-               else if (Oceania.indexOf(d.target.name) != -1) return Oceania_color
-       })
-       .sort(function(a, b) { return b.dy - a.dy; });
-  }    
+      .sort(function(a, b) {
+          return b.dy - a.dy; 
+      });
  
 // add the link tooltip
   link.on("mouseover", function(d) {      
@@ -397,14 +373,6 @@ function make(graph){
       .style("stroke-width", "2px")
       .style("stroke", "#555");
 
-  if (testFlag === 1) { //test button has been clicked
-    rect.transition().delay(1000)
-        .attr("height", function(d, i) { 
-          d_new = graph3.nodes[i];
-          return d_new.dy; 
-        });
-  }
-    
 
 // add the node tooltip
   node.on("mouseover", function(d) {      
@@ -420,16 +388,92 @@ function make(graph){
         });
  
 // add in the title for the nodes
-  node.append("text")
+  var text = node.append("text")
       .attr("x", -6)
       .attr("y", function(d) { return d.dy / 2; })
       .attr("dy", ".35em")
       .attr("text-anchor", "end")
       .attr("transform", null)
-      .text(function(d) { return d.name; })
+      .text(function(d) { 
+        console.log("d.name in text orig: ", d.name)
+        return d.name; })
     .filter(function(d) { return d.x < width / 2; })
       .attr("x", 6 + sankey.nodeWidth())
       .attr("text-anchor", "start");
+
+console.log("text first: ", text)
+
+// transition all elements between button clicks
+  if (testFlag === 1) { //test button has been clicked
+
+    //1. LINKS
+    
+    //http://bost.ocks.org/mike/transition/
+    var bar = svg.selectAll(".link")
+                 .data(graph3.links);
+
+    bar.enter().append("path")
+        .attr("class", "link")
+       
+    bar.transition()
+       .duration(1000).delay(100)
+       .attr("d", path3)
+       .style("stroke-width", function(d, i) { 
+          dlink =  graph3.links[i];
+          return Math.max(1, dlink.dy); 
+        })
+       .style("stroke", function(d, i) {
+         dlink =  graph3.links[i];
+         if (Europe.indexOf(dlink.target.name) != -1) return Europe_color 
+               else if (NorthAmerica.indexOf(dlink.target.name) != -1) return NorthAmerica_color
+               else if (CentralAmerica.indexOf(dlink.target.name) != -1) return CentralAmerica_color
+               else if (SouthAmerica.indexOf(dlink.target.name) != -1) return SouthAmerica_color
+               else if (Asia.indexOf(dlink.target.name) != -1) return Asia_color
+               else if (MiddleEast.indexOf(dlink.target.name) != -1) return MiddleEast_color
+               else if (Africa.indexOf(dlink.target.name) != -1) return Africa_color
+               else if (Oceania.indexOf(dlink.target.name) != -1) return Oceania_color
+       })
+       .sort(function(a, b) { 
+          console.log("a: ", a)
+          console.log("b: ", b)
+          return b.dy - a.dy; 
+        });
+
+    //2. RECTS
+    rect.transition().delay(1000)
+        .attr("height", function(d, i) { 
+          d_new = graph3.nodes[i];
+          return d_new.dy; 
+    });
+
+    //3. TEXT
+    console.log("text: ", text)
+    console.log("d3.selectAll text: ", d3.selectAll(".node").select("text"))
+
+    text.transition().delay(1000)
+      .attr("x", -6)
+      .attr("y", function(d, i) { 
+        d_new = graph3.nodes[i];
+        //console.log("d_new, i: ", d_new +", "+ i)
+        return d_new.dy / 2; 
+      })
+      .attr("dy", ".35em")
+      .attr("text-anchor", "end")
+      .attr("transform", null)
+      .text(function(d, i) { 
+        console.log("i: ", i)
+        d_new = graph3.nodes[i];
+        return d_new.name; 
+      }) //sources and continents correct
+      .filter(function(d, i) { //only loops over sources and continents
+        //console.log("i: ", i)
+        d_new = graph3.nodes[i];
+        return d_new.x < width / 2; 
+      })
+      .attr("x", 6 + sankeyObj3.nodeWidth())
+      .attr("text-anchor", "start");
+       
+  }          
 
 // the function for moving the nodes
   function dragmove(d) {
