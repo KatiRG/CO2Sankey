@@ -353,7 +353,9 @@ function make(graph){
  
 // add the rectangles for the nodes
   var rect = node.append("rect").attr("id", "rectId")
-      .attr("height", function(d) { return d.dy; })
+      .attr("height", function(d) { 
+        console.log("d in rect: ", d)
+        return d.dy; })
       .attr("width", sankey.nodeWidth())
       .style("fill", function(d) { 
       	if (Europe.indexOf(d.name) != -1) return Europe_color 
@@ -462,6 +464,40 @@ console.log("text first: ", text)
             else if (d_new.name == "Cement") return Cement_color
         });
 
+    //add missing node (South America in test case) and append rect and text
+    missing_idx = 12;
+    //d3.selectAll("g").append("g")
+    svg.append("g")
+       .attr("class", "node")
+       .attr("transform", 
+          "translate(" + 580 + "," + 543.8 + ")")
+       .append("rect").attr("id", "rectId")
+       .attr("height", function(d) { 
+          missingd = graph3.nodes[missing_idx];
+          return missingd.dy; 
+        })
+        .attr("width", sankey.nodeWidth())
+        .style("fill", function(d) {
+          d_new = graph3.nodes[missing_idx];
+          if (Europe.indexOf(d_new.name) != -1) return Europe_color 
+            else if (NorthAmerica.indexOf(d_new.name) != -1) return NorthAmerica_color
+            else if (CentralAmerica.indexOf(d_new.name) != -1) return CentralAmerica_color
+            else if (SouthAmerica.indexOf(d_new.name) != -1) return SouthAmerica_color
+            else if (Asia.indexOf(d_new.name) != -1) return Asia_color
+            else if (MiddleEast.indexOf(d_new.name) != -1) return MiddleEast_color
+            else if (Africa.indexOf(d_new.name) != -1) return Africa_color
+            else if (Oceania.indexOf(d_new.name) != -1) return Oceania_color
+            else if (d_new.name == "Coal") return Coal_color
+            else if (d_new.name == "Oil") return Oil_color
+            else if (d_new.name == "Gas") return Gas_color
+            else if (d_new.name == "Gas flaring") return GasFlaring_color
+            else if (d_new.name == "Cement") return Cement_color
+          })
+        .style("stroke-width", "2px")
+        .style("stroke", "#555");
+
+    
+
     //3. TEXT
     console.log("text: ", text)
     console.log("d3.selectAll text: ", d3.selectAll(".node").select("text"))
@@ -556,7 +592,6 @@ console.log("text first: ", text)
     d3.select("#link-"+id).style("stroke-opacity", opacity);
   }
 
-  // manually customize node position
   function nodeTransition() {
     console.log("in nodeTransition")
 
