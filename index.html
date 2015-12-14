@@ -356,20 +356,20 @@ function make(graph){
       .attr("height", function(d) { return d.dy; })
       .attr("width", sankey.nodeWidth())
       .style("fill", function(d) { 
-	if (Europe.indexOf(d.name) != -1) return Europe_color 
-        else if (NorthAmerica.indexOf(d.name) != -1) return NorthAmerica_color
-        else if (CentralAmerica.indexOf(d.name) != -1) return CentralAmerica_color
-        else if (SouthAmerica.indexOf(d.name) != -1) return SouthAmerica_color
-        else if (Asia.indexOf(d.name) != -1) return Asia_color
-        else if (MiddleEast.indexOf(d.name) != -1) return MiddleEast_color
-        else if (Africa.indexOf(d.name) != -1) return Africa_color
-        else if (Oceania.indexOf(d.name) != -1) return Oceania_color
-        else if (d.name == "Coal") return Coal_color
-        else if (d.name == "Oil") return Oil_color
-        else if (d.name == "Gas") return Gas_color
-        else if (d.name == "Gas flaring") return GasFlaring_color
-        else if (d.name == "Cement") return Cement_color
-	})
+      	if (Europe.indexOf(d.name) != -1) return Europe_color 
+              else if (NorthAmerica.indexOf(d.name) != -1) return NorthAmerica_color
+              else if (CentralAmerica.indexOf(d.name) != -1) return CentralAmerica_color
+              else if (SouthAmerica.indexOf(d.name) != -1) return SouthAmerica_color
+              else if (Asia.indexOf(d.name) != -1) return Asia_color
+              else if (MiddleEast.indexOf(d.name) != -1) return MiddleEast_color
+              else if (Africa.indexOf(d.name) != -1) return Africa_color
+              else if (Oceania.indexOf(d.name) != -1) return Oceania_color
+              else if (d.name == "Coal") return Coal_color
+              else if (d.name == "Oil") return Oil_color
+              else if (d.name == "Gas") return Gas_color
+              else if (d.name == "Gas flaring") return GasFlaring_color
+              else if (d.name == "Cement") return Cement_color
+      	})
       .style("stroke-width", "2px")
       .style("stroke", "#555");
 
@@ -444,7 +444,23 @@ console.log("text first: ", text)
         .attr("height", function(d, i) { 
           d_new = graph3.nodes[i];
           return d_new.dy; 
-    });
+        })        
+        .style("fill", function(d, i) {
+          d_new = graph3.nodes[i];          
+          if (Europe.indexOf(d_new.name) != -1) return Europe_color 
+            else if (NorthAmerica.indexOf(d_new.name) != -1) return NorthAmerica_color
+            else if (CentralAmerica.indexOf(d_new.name) != -1) return CentralAmerica_color
+            else if (SouthAmerica.indexOf(d_new.name) != -1) return SouthAmerica_color
+            else if (Asia.indexOf(d_new.name) != -1) return Asia_color
+            else if (MiddleEast.indexOf(d_new.name) != -1) return MiddleEast_color
+            else if (Africa.indexOf(d_new.name) != -1) return Africa_color
+            else if (Oceania.indexOf(d_new.name) != -1) return Oceania_color
+            else if (d_new.name == "Coal") return Coal_color
+            else if (d_new.name == "Oil") return Oil_color
+            else if (d_new.name == "Gas") return Gas_color
+            else if (d_new.name == "Gas flaring") return GasFlaring_color
+            else if (d_new.name == "Cement") return Cement_color
+        });
 
     //3. TEXT
     console.log("text: ", text)
