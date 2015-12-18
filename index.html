@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+
+<script src="lib/jquery-1.10.2.min.js"></script>
+<!--bootstrap 3.0.2 -->
+<link href="lib/bootstrap.css" rel="stylesheet">
+<script src="lib/bootstrap.min.js"></script>
+<link href="lib/sticky-footer-navbar.css" rel="stylesheet"> 
+
 <title>CO2 Emissions 2014: Sources / Regions / Countries</title>
 <style>
 
 html {
   font-family: Arial;
   color: #555;
+}
+
+
+
+.container {
+    margin-left: 10px;
 }
  
 .node rect {
@@ -71,14 +84,33 @@ div.tooltip {
 }
 ul {
     list-style: outside none none;
+    margin-top: 80px;
 }
+
 
 </style>
 <body>
+<div id="wrap">
 
-<h3>
-CO2 Emissions 2014: Sources / Regions / Countries
-</h3>
+  <!-- Fixed navbar -->
+  <div class="navbar navbar-default navbar-fixed-top" >
+    <div class="container">
+      <div class="navbar-header">            
+        <span class="icon-bar"></span>        
+        <div class="navbar-brand" href="index.html">
+          <b>CO2 Emissions 2014: Sources > Regions > Countries</b>
+        </div>
+      </div>      
+    </div>
+  </div>
+
+<!-- Begin page content -->
+<div class="container">
+
+<p style='width: 600px;'>
+This Sankey diagram represents CO2 emission flows from five major sources (left column) and their proportional distibution over region (middle column) and country (right column, 50 highest).
+Data based on the <b>latest 2014 figures</b> available at the <a href='http://www.globalcarbonatlas.org' target="_blank">Global Carbon Atlas</a>.
+</p><p><p>
 
 <ul class="nytg-navigation" style='position: absolute; left: 100px; top: 100px;'>
 <li id="TA" class="selected">MtCO2</li>
@@ -372,21 +404,26 @@ function highlight_link(id,opacity){
  
 </script>
 
-<p style='width: 600px;'>
-This Sankey diagram represents CO2 emission flows from five major sources (left column) and their proportional distibution over region (middle column) and country (right column, 50 highest).
-This diagram shows the <b>latest 2014 figures</b> available from Global Carbon Atlas at <a href='http://www.globalcarbonatlas.org'>http://www.globalcarbonatlas.org</a>.
-</p>
 
-<p style='width: 600px;'>
-<i><b>Source:</b> CDIAC: Boden, TA, G Marland, and RJ Andres. 2013. Global, Regional, and National Fossil-Fuel CO2 Emissions. Carbon Dioxide Information Analysis Center (CDIAC), Oak Ridge National Laboratory, US Department of Energy, Oak Ridge, Tenn., USA doi:10.3334/CDIAC/00001_V2013
-<a href='http://cdiac.ornl.gov/trends/emis/meth_reg.html'>http://cdiac.ornl.gov/trends/emis/meth_reg.html</a>
+
+<p style='width: 1000px;'>
+<i><b>Source:</b> <a href='http://cdiac.ornl.gov/trends/emis/meth_reg.html' target="_blank">CDIAC</a>: Boden, TA, G Marland, and RJ Andres. 2013. Global, Regional, and National Fossil-Fuel CO2 Emissions. Carbon Dioxide Information Analysis Center (CDIAC), Oak Ridge National Laboratory, US Department of Energy, Oak Ridge, Tenn., USA doi:10.3334/CDIAC/00001_V2013
+
 </i>
 </p>
 
-<p>Created by <span title="Climate and Environment Sciences Laboratory" style="font-weight:bold;">LSCE</span> &nbsp;<img src="LSCE_Icon.png" title="Climate and Environment Sciences Laboratory"/>&nbsp;&nbsp;Version 1.2 - 2015/12/09<br>
-Authors: Cathy Nangini, Patrick Brockmann<br>
-Thanks to Mike Bostock, Ashish Singh
-</p>
+
+</div> <!-- /.container -->
+</div>  <!-- /.wrap -->
+
+<div id="footer">
+  <div class="container">
+    <p class="text-muted credit"><span title="Climate and Environment Sciences Laboratory" style="font-weight:bold;">LSCE</span> &nbsp;<img src="LSCE_Icon.png" title="Climate and Environment Sciences Laboratory" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Version 1.2 - 2015/12/09 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Authors: Cathy Nangini, Patrick Brockmann. Thanks to Mike Bostock, Ashish Singh</p>
+
+  </div>
+</div>
 
 </body>
 </html>
