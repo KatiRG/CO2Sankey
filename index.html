@@ -87,6 +87,12 @@ ul {
     margin-top: 80px;
 }
 
+#infotext {
+  position: relative;
+  top: 94px;
+  left: 16px;
+}
+
 
 </style>
 <body>
@@ -108,8 +114,8 @@ ul {
 <div class="container">
 
 <p style='width: 600px;'>
-This Sankey diagram represents CO2 emission flows from five major sources (left column) and their proportional distibution over region (middle column) and country (right column, 50 highest).
-Data based on the <b>latest 2014 figures</b> available at the <a href='http://www.globalcarbonatlas.org' target="_blank">Global Carbon Atlas</a>.
+This Sankey diagram represents CO2 emission flows from five major sources (left column) and their proportional distibution over region (middle column) and country (right column, 50 highest), for three different perspectives (MtCO2, kgCO2/GDP, tCO2/person).
+<p>Data based on the latest 2014 figures available at the <a href='http://www.globalcarbonatlas.org' target="_blank">Global Carbon Atlas</a>.
 </p><p><p>
 
 <ul class="nytg-navigation" style='position: absolute; left: 100px; top: 100px;'>
@@ -118,6 +124,8 @@ Data based on the <b>latest 2014 figures</b> available at the <a href='http://ww
 <li id="TC">tCO2/person</li>
 </ul>
  
+<div id="infotext" style='width: 700px;'></div> 
+
 <p id="chart">
  
 <script src="d3.v3.min.js"></script>
@@ -237,7 +245,18 @@ d3.json("emissions_MtCO2.json", function(error, graph) {
 	make(graph);
 });
  
+
 function make(graph){
+  //Change info text based on which button is clicked
+  if (d3.select("#TA").attr("class")) {
+    d3.select("#infotext").text("China, the US, Europe and India continue to be the world's top emitters in 2014, amounting to 59% of global emissions.")
+  } else if (d3.select("#TB").attr("class")) {
+    d3.select("#infotext").text('bbbb')
+  } else {
+    d3.select("#infotext").text('ccc')
+  }
+
+
     var nodeMap = {};
     graph.nodes.forEach(function(x) { nodeMap[x.name] = x; });
     graph.links = graph.links.map(function(x) {
