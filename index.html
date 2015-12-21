@@ -95,7 +95,7 @@ ul {
 
 #sortCol {
   position: relative;
-  top: -815px;
+  top: -816px;
   left: 1263px;
 }
 
@@ -340,8 +340,7 @@ function make(graph){
       .data(graph.nodes)
     .enter().append("g")
       .attr("class", "node")
-      .attr("transform", function(d) { 
-        console.log("d in node: ", d)
+      .attr("transform", function(d) {
 	       return "translate(" + d.x + "," + d.y + ")"; })
     .on("click",highlight_node_links);
  
@@ -350,7 +349,7 @@ function make(graph){
       .attr("height", function(d) { return d.dy; })
       .attr("width", sankey.nodeWidth())
       .style("fill", function(d) { 
-	if (Europe.indexOf(d.name) != -1) return Europe_color 
+    	if (Europe.indexOf(d.name) != -1) return Europe_color 
         else if (NorthAmerica.indexOf(d.name) != -1) return NorthAmerica_color
         else if (CentralAmerica.indexOf(d.name) != -1) return CentralAmerica_color
         else if (SouthAmerica.indexOf(d.name) != -1) return SouthAmerica_color
@@ -363,7 +362,7 @@ function make(graph){
         else if (d.name == "Gas") return Gas_color
         else if (d.name == "Gas flaring") return GasFlaring_color
         else if (d.name == "Cement") return Cement_color
-	})
+    	})
       .style("stroke-width", "2px")
       .style("stroke", "#555");
 
@@ -395,27 +394,77 @@ function make(graph){
 // sortButton
   d3.select("#sortButton")
     .on("click", function() {
+      var idx = 0;
+      var yval = []; //array for ycoords
+      delta = 10; //spacing between rects
       d3.select(this).attr("class", "selected");
-      //d3.select("#sortCol").text("in here")
+
+
+      //sort the y-coords of country rects by increasing size and store in array
+      ycoord = []; yheight = [];
       d3.selectAll("g.node")
-        .filter(function(d) { 
+        .filter(function (d) {
           if (d.x === 1160) {
-            // console.log("greater: ", d.x);
-            // console.log("d: ", d) //note: already sorted by decreasing value
+            // ycoord.push(d.y);
+            // ycoord.sort(sortNumber);
+            // return ycoord;
 
-            // add in the nodes
-            // var node2 = svg2.append("g").selectAll(".node")
-            //     .data(d)
-            //   .enter().append("g")
-            //     .attr("class", "node")
-            //     .attr("transform", function(d) { 
-            //       console.log("d in node: ", d)
-            //        return "translate(" + d.x + 100 + "," + d.y + ")"; 
-            //      });
+            yheight.push(d.dy);
+            yheight.sort(sortNumber);
+            return yheight;
+          }  
+        });
+      //console.log("ycoord: ", ycoord)
+      //console.log("yheight: ", yheight)
 
+      function sortNumber(a,b) {
+          return b - a;  //use a - b to sort in increasing order
+      }
 
-          } 
-          //return d.x === 1160;
+      //make a new rect column
+      //plot in order of increasing height using sorted y-coords
+      d3.selectAll("g.node")
+        .filter(function (d) {
+          if (d.x === 1160) {
+            //console.log("idx: ", idx)
+            //console.log("d: ", d) //note: already sorted by decreasing value
+            dfilt = d;
+            
+          var rect = svg2.append("rect")
+              .attr("height", function (d) {
+                //console.log("do you know d? ", dfilt);
+                return dfilt.dy; 
+              })
+              .attr("width", sankey.nodeWidth())
+              .attr("transform", function (d) {                
+                console.log("idx here: ", idx)
+                if (idx === 0) yval[idx] = 0;
+                else {
+                  //console.log("yheight[idx - 1]: ", yheight[idx-1])
+                  yval[idx] = yval[idx - 1] + yheight[idx - 1] + delta;
+                  console.log("yval[idx]: ", yval[idx])
+                }
+                
+
+                //yval = dfilt.y;
+                return "translate(" + 0 + "," + yval[idx] + ")"; 
+               })
+              .style("fill", function (d) { 
+                if (Europe.indexOf(dfilt.name) != -1) return Europe_color 
+                      else if (NorthAmerica.indexOf(dfilt.name) != -1) return NorthAmerica_color
+                      else if (CentralAmerica.indexOf(dfilt.name) != -1) return CentralAmerica_color
+                      else if (SouthAmerica.indexOf(dfilt.name) != -1) return SouthAmerica_color
+                      else if (Asia.indexOf(dfilt.name) != -1) return Asia_color
+                      else if (MiddleEast.indexOf(dfilt.name) != -1) return MiddleEast_color
+                      else if (Africa.indexOf(dfilt.name) != -1) return Africa_color
+                      else if (Oceania.indexOf(dfilt.name) != -1) return Oceania_color
+                })
+              .style("stroke-width", "2px")
+              .style("stroke", "#555");
+
+            idx++;
+          }          
+          
         })
         
     });      
