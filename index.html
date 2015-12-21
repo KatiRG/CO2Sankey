@@ -93,6 +93,11 @@ ul {
   left: 16px;
 }
 
+#sortCol {
+  position: relative;
+  top: -815px;
+  left: 1263px;
+}
 
 </style>
 <body>
@@ -127,6 +132,12 @@ This Sankey diagram represents CO2 emission flows from five major sources (left 
 <div id="infotext" style='width: 700px;'></div> 
 
 <p id="chart">
+
+<ul class="nytg-navigation" style='position: absolute; right: 375px; top: 26px;'>
+<li id="sortButton">Sort</li>
+</ul>  
+
+<div id="sortCol"></div>
  
 <script src="d3.v3.min.js"></script>
 <script src="sankey.js"></script>
@@ -147,6 +158,14 @@ var svg = d3.select("#chart").append("svg")
   .append("g")
     .attr("transform", 
           "translate(" + margin.left + "," + margin.top + ")");
+
+// create svg for sorted column
+var svg2 = d3.select("#sortCol").append("svg")
+    .attr("width", 150 + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");    
  
 // Set the sankey diagram properties
 var sankey = d3.sankey()
@@ -322,6 +341,7 @@ function make(graph){
     .enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { 
+        console.log("d in node: ", d)
 	       return "translate(" + d.x + "," + d.y + ")"; })
     .on("click",highlight_node_links);
  
@@ -371,6 +391,34 @@ function make(graph){
     .filter(function(d) { return d.x < width / 2; })
       .attr("x", 6 + sankey.nodeWidth())
       .attr("text-anchor", "start");
+
+// sortButton
+  d3.select("#sortButton")
+    .on("click", function() {
+      d3.select(this).attr("class", "selected");
+      //d3.select("#sortCol").text("in here")
+      d3.selectAll("g.node")
+        .filter(function(d) { 
+          if (d.x === 1160) {
+            // console.log("greater: ", d.x);
+            // console.log("d: ", d) //note: already sorted by decreasing value
+
+            // add in the nodes
+            // var node2 = svg2.append("g").selectAll(".node")
+            //     .data(d)
+            //   .enter().append("g")
+            //     .attr("class", "node")
+            //     .attr("transform", function(d) { 
+            //       console.log("d in node: ", d)
+            //        return "translate(" + d.x + 100 + "," + d.y + ")"; 
+            //      });
+
+
+          } 
+          //return d.x === 1160;
+        })
+        
+    });      
  
 // http://bl.ocks.org/git-ashish/8959771
 function highlight_node_links(node,i){
