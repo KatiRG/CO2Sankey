@@ -131,8 +131,8 @@ This Sankey diagram represents CO2 emission flows from five major sources (left 
 
 <p id="chart">
 
-<ul class="nytg-navigation" style='position: absolute; right: 375px; top: 26px;'>
-<li id="sortButton">Sort all</li>
+<ul class="nytg-navigation" style='position: absolute; right: 301px; top: 26px;'>
+<li id="sortButton">Sort countries</li>
 </ul>  
 
 <div id="sortCol"></div>
@@ -159,7 +159,7 @@ var svg = d3.select("#chart").append("svg")
 
 // create svg for sorted column
 var svg2 = d3.select("#sortCol").append("svg")
-    .attr("width", 150 + margin.left + margin.right)
+    .attr("width", 200 + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", 
@@ -371,16 +371,16 @@ function make(graph){
       .style("stroke", "#555");
 
 // add the node tooltip
-  node.on("mouseover", function(d) {      
-            div.transition()        
-                .style("opacity", .9);      
+  node.on("mouseover", function(d) {
+            div.transition()
+                .style("opacity", .9);
             div.html(d.name + "<br><b>" + format(d.value) + "</b>")
-                .style("left", (d3.event.pageX) + "px")     
-                .style("top", (d3.event.pageY) + "px");    
-            })                  
-        .on("mouseout", function(d) {       
-            div.transition()        
-                .style("opacity", 0);   
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY) + "px");
+            })
+        .on("mouseout", function(d) {
+            div.transition()
+                .style("opacity", 0);
         });
  
 // add in the title for the nodes
@@ -400,14 +400,14 @@ function make(graph){
   d3.select("#sortButton")
     .on("click", function() {
       var idx = 0;
+      var yheight = []; //array to store sorted rect height array
       var yval = []; //array to store calculated ycoords
       var ynames = []; //array to store sorted names
       delta = 10; //spacing between rects
 
       d3.select(this).attr("class", "selected");
 
-    // Sort the rect heights by decreasing size and store in array
-      ycoord = []; yheight = [];
+    // Sort the rect heights by decreasing size and store in array      
       d3.selectAll("g.node")
         .filter(function (d) {
           if (d.x === 1160) { //select rects in last column (countries)
@@ -424,16 +424,13 @@ function make(graph){
     // Plot rects in order of increasing height on an svg2 canvas
       d3.selectAll("g.node")
         .filter(function (d) {
-          if (d.x === 1160) {
-            //console.log("idx: ", idx)
-            //console.log("d: ", d) //note: already sorted by decreasing value
+          if (d.x === 1160) {//selects last col (countries)
             dfilt = d;
-            ynames[idx] = d.name;
+            ynames[idx] = d.name; //save country names
             
-          var rect = svg2.append("g").attr("class", "node")
+          var rect = svg2.append("g")
               .append("rect")
-              .attr("height", function (d) {
-                //console.log("do you know d? ", dfilt);
+              .attr("height", function (d) {              
                 return dfilt.dy; 
               })
               .attr("width", sankey.nodeWidth())
@@ -444,10 +441,6 @@ function make(graph){
                 }              
                 return "translate(" + 0 + "," + yval[idx] + ")"; 
                })
-              .attr("id", function(d,i){
-                //return "sorted-"+idx;
-                return "id-sorted";
-              })
               .style("fill", function (d) { 
                 if (Europe.indexOf(dfilt.name) != -1) return Europe_color 
                       else if (NorthAmerica.indexOf(dfilt.name) != -1) return NorthAmerica_color
@@ -464,19 +457,20 @@ function make(graph){
             idx++;
           }
         }) //end d.x filter
+      
 
+    // add text
       svg2.selectAll("g")
-          //.selectAll("#id-sorted")
           .append("text")
         .attr("x", 26)
-        //.attr("y", function (d, i) { return yheight[i] / 2; } )
-        .attr("y", function (d, i) { 
-          return yheight[idx - 1] + delta; 
+        .attr("y", function (d, i) {
+          console.log("yheight: ", yheight[i]/2)
+          console.log("yval: ", yval[i])
+          return yval[i] + yheight[i] / 2; 
         } )
         .attr("dy", ".35em")
         .attr("text-anchor", "start")
-        //.attr("transform", null)
-        .text(function (d, i) { return ynames[i]; })
+        .text(function (d, i) { return i + 1 +": "+ ynames[i]; })
           .style("stroke-width", "2px")
           .style("fill", "#555");
         
