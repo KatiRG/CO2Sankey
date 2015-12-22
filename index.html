@@ -430,7 +430,8 @@ function make(graph){
             dfilt = d;
             ynames[idx] = d.name;
             
-          var rect = svg2.append("rect")
+          var rect = svg2.append("g").attr("class", "node")
+              .append("rect")
               .attr("height", function (d) {
                 //console.log("do you know d? ", dfilt);
                 return dfilt.dy; 
@@ -464,14 +465,18 @@ function make(graph){
           }
         }) //end d.x filter
 
-      d3.selectAll("#id-sorted").append("text")
+      svg2.selectAll("g")
+          //.selectAll("#id-sorted")
+          .append("text")
         .attr("x", 26)
-        .attr("y", function (d, i) { return yheight[i] / 2; } )
+        //.attr("y", function (d, i) { return yheight[i] / 2; } )
+        .attr("y", function (d, i) { 
+          return yheight[idx - 1] + delta; 
+        } )
         .attr("dy", ".35em")
         .attr("text-anchor", "start")
         //.attr("transform", null)
         .text(function (d, i) { return ynames[i]; })
-          .style("stroke", "red")
           .style("stroke-width", "2px")
           .style("fill", "#555");
         
