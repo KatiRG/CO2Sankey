@@ -116,9 +116,10 @@ ul {
 <!-- Begin page content -->
 <div class="container">
 
-<p style='width: 600px;'>
+<p style='width: 750px;'>
 This Sankey diagram represents CO2 emission flows from five major sources (left column) and their proportional distibution over region (middle column) and country (right column, 50 highest), for three different perspectives (MtCO2, kgCO2/GDP, tCO2/person).
-<p>Data based on the latest 2014 figures available at the <a href='http://www.globalcarbonatlas.org' target="_blank">Global Carbon Atlas</a>.
+Data based on the latest 2014 figures available at the <a href='http://www.globalcarbonatlas.org' target="_blank">Global Carbon Atlas</a>.
+<p>Click "Sort countries" to see how the rank of countries changes for each perspective.
 </p><p><p>
 
 <ul class="nytg-navigation" style='position: absolute; left: 100px; top: 100px;'>
@@ -277,9 +278,9 @@ function make(graph){
   if (d3.select("#TA").attr("class")) {
     d3.select("#infotext").text("China, the US, Europe and India continue to be the world's top emitters in 2014, amounting to 59% of global emissions.")
   } else if (d3.select("#TB").attr("class")) {
-    d3.select("#infotext").text("Asia is still the top emitter in terms of kgCO2/GDP (using GDP-NER ?), but China falls to 4th place in this region after Turkmenistan, Mongolia and Uzbekistan, and India falls to 7th place. Zimbabwe has relatively very low emissions but also a low GDP, therefore it has quite a high kgCO2/GDP ratio. Both China and India have higher kgCO2/GDP ratios than the US, but the Russian Federation outranks all three.")
+    d3.select("#infotext").text("When CO2 emissions are normalized by GDP, China falls to 4th place in Asia (11th overall) after Turkmenistan, Mongolia and Uzbekistan, and India falls to 7th place (25th overall). Zimbabwe has relatively very low emissions but also a low GDP, therefore it has quite a high kgCO2/GDP ratio. Both China and India have higher kgCO2/GDP ratios than the US (38th overall). Trinidad and Tobago sit at 2nd place when CO2 emissions are normalized by GDP as well as per person.")
   } else {
-    d3.select("#infotext").text("2014 was the first year in which China’s per capita emissions are larger than those of the EU28.")
+    d3.select("#infotext").text("2014 was the first year in which China’s per capita emissions were larger than those of the EU28. Per capita emissions for Qatar were highest, despite being 39th when measured as both MtCO2 and per GDP. Trinidad and Tobago ranked 2nd when measured per GDP and per person, whereas by volume of MtCO2 they did not make the top 50. ")
   }
 
 
