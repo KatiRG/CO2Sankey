@@ -95,12 +95,45 @@ d3.sankey = function() {
  
   // Compute the value (size) of each node by summing the associated links.
   function computeNodeValues() {
-    nodes.forEach(function(node) {
-      node.value = Math.max(
-        d3.sum(node.sourceLinks, value),
-        d3.sum(node.targetLinks, value)
-      );
-    });
+    nodes.forEach(function(node) {      
+      if (units === "tCO2/person" || units === "kgCO2/GDP") {       
+        if (node.name === "Central America" || node.name === "Middle East" || node.name === "Asia"
+            || node.name === "North America" || node.name === "Europe" || node.name === "Oceania"
+            || node.name === "South America" || node.name === "Africa"
+            || node.name === "Coal" || node.name === "Oil" || node.name === "Gas" 
+            || node.name === "Cement" || node.name === "Gas flaring") {
+          console.log("node: ", node)
+          console.log("node.sourceLinks: ", node.sourceLinks)
+          //cycle through targetLinks.value and get mean of array
+          slink_array = [];
+          num_slink = Object.keys(node.sourceLinks).length;
+          console.log("num slink: ", num_slink)
+          node.sourceLinks.forEach(function (slink) {
+            console.log("slink: ", slink)
+            slink_array.push(slink.value);
+          })
+          
+          node.value = d3.sum(slink_array)/num_slink; //counts nan's
+        } else { //all other non-Region nodes for tCO2/person
+
+          node.value = Math.max(
+            d3.sum(node.sourceLinks, value),
+            d3.sum(node.targetLinks, value)
+          );
+          console.log("node out of forEach: ", node)
+          console.log("node.value: ", node.value)
+        }
+      } else { //all other measures
+
+        node.value = Math.max(
+          d3.sum(node.sourceLinks, value),
+          d3.sum(node.targetLinks, value)
+        );
+        console.log("node out of forEach: ", node)
+        console.log("node.value: ", node.value)
+      }
+
+    }); //end nodes.forEach
   }
  
   // Iteratively assign the breadth (x-position) for each node.

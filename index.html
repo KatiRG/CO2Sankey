@@ -245,7 +245,7 @@ d3.select("#TB")
     	d3.select(this).attr("class", "selected");
       d3.select("#sortButton").text("Sort countries").attr("class", "selected");
 	units = "kgCO2/GDP";
-	d3.json("emissions_kgCO2_GDP.json", function(error, graph) {
+	d3.json("emissions_kgCO2_GDP_v2.json", function(error, graph) {
 		svg.selectAll("*").remove();
     svg2.selectAll("*").remove(); //clears sort rects
 		make(graph);
@@ -259,7 +259,7 @@ d3.select("#TC")
     	d3.select(this).attr("class", "selected");
       d3.select("#sortButton").text("Sort countries").attr("class", "selected");
 	units = "tCO2/person";
-	d3.json("emissions_tCO2_person.json", function(error, graph) {
+	d3.json("emissions_tCO2_person_v2.json", function(error, graph) {
 		svg.selectAll("*").remove();
     svg2.selectAll("*").remove(); //clears sort rects
 		make(graph);
@@ -316,7 +316,10 @@ function make(graph){
     		d.id = i;
     		return "link-"+i;
     	})
-      .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+      .style("stroke-width", function(d) { 
+        if (units === "MtCO2") return Math.max(1, d.dy);
+        else return 1;
+      })
       .style("stroke", function(d) {
 	       if (Europe.indexOf(d.target.name) != -1) return Europe_color 
                else if (NorthAmerica.indexOf(d.target.name) != -1) return NorthAmerica_color
