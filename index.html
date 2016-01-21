@@ -247,7 +247,7 @@ d3.select("#TB")
     	d3.select(this).attr("class", "selected");
       d3.select("#sortButton").text("Sort countries").attr("class", "selected");
 	units = "kgCO2/GDP";
-  rectFactor = 100;
+  rectFactor = 11; //if any larger, Zimbabwe gets cut off
 	d3.json("emissions_kgCO2_GDP_v2.json", function(error, graph) {
 		svg.selectAll("*").remove();
     svg2.selectAll("*").remove(); //clears sort rects
