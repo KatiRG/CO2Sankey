@@ -262,7 +262,7 @@ d3.select("#TC")
     	d3.select(this).attr("class", "selected");
       d3.select("#sortButton").text("Sort countries").attr("class", "selected");
 	units = "tCO2/person";
-  rectFactor = 2;
+  rectFactor = 0.7; //any larger and Qatar gets cut off
 	d3.json("emissions_tCO2_person_v2.json", function(error, graph) {
 		svg.selectAll("*").remove();
     svg2.selectAll("*").remove(); //clears sort rects
