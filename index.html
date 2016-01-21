@@ -232,7 +232,7 @@ d3.select("#TA")
     	d3.selectAll(".nytg-navigation li").attr("class", "");
     	d3.select(this).attr("class", "selected");
       d3.select("#sortButton").text("Sort countries").attr("class", "selected");
-	units = "MtCO2";
+	units = "MtCO2";  
 	d3.json("emissions_MtCO2.json", function(error, graph) {
 		svg.selectAll("*").remove();
     svg2.selectAll("*").remove(); //clears sort rects
@@ -247,6 +247,7 @@ d3.select("#TB")
     	d3.select(this).attr("class", "selected");
       d3.select("#sortButton").text("Sort countries").attr("class", "selected");
 	units = "kgCO2/GDP";
+  rectFactor = 100;
 	d3.json("emissions_kgCO2_GDP_v2.json", function(error, graph) {
 		svg.selectAll("*").remove();
     svg2.selectAll("*").remove(); //clears sort rects
@@ -261,6 +262,7 @@ d3.select("#TC")
     	d3.select(this).attr("class", "selected");
       d3.select("#sortButton").text("Sort countries").attr("class", "selected");
 	units = "tCO2/person";
+  rectFactor = 2;
 	d3.json("emissions_tCO2_person_v2.json", function(error, graph) {
 		svg.selectAll("*").remove();
     svg2.selectAll("*").remove(); //clears sort rects
@@ -276,6 +278,7 @@ d3.json("emissions_MtCO2.json", function(error, graph) {
  
 
 function make(graph){
+
   //Change info text based on which button is clicked
   if (d3.select("#TA").attr("class")) {
     d3.select("#infotext").text("China, the US, Europe and India continue to be the world's top emitters in 2014, amounting to 59% of global emissions.")
@@ -362,7 +365,13 @@ function make(graph){
       .attr("height", function(d) { return d.dy; })
       .attr("width", function(d) {
         if (units === "MtCO2") return sankey.nodeWidth();
-        else return d.value;
+        else {
+          console.log("rectFactor------------------------ ", rectFactor)
+          console.log("d.value------------------------ ", d.value)
+          newWidth = d.value * rectFactor;
+          console.log("newWidth************************* ", newWidth)
+          return newWidth;
+        }
       })
       .style("fill", function(d) { 
     	if (Europe.indexOf(d.name) != -1) return Europe_color 
