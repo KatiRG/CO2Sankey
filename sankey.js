@@ -1,4 +1,5 @@
 d3.sankey = function() {
+
   var sankey = {},
       nodeWidth = 24,
       nodePadding = 8,
@@ -119,9 +120,7 @@ d3.sankey = function() {
           node.value = Math.max(
             d3.sum(node.sourceLinks, value),
             d3.sum(node.targetLinks, value)
-          );
-          console.log("node out of forEach: ", node)
-          console.log("node.value: ", node.value)
+          );         
         }
       } else { //all other measures
 
@@ -129,8 +128,7 @@ d3.sankey = function() {
           d3.sum(node.sourceLinks, value),
           d3.sum(node.targetLinks, value)
         );
-        console.log("node out of forEach: ", node)
-        console.log("node.value: ", node.value)
+       
       }
 
     }); //end nodes.forEach
@@ -149,7 +147,7 @@ d3.sankey = function() {
       nextNodes = [];
       remainingNodes.forEach(function(node) {
         node.x = x;
-        node.dx = nodeWidth;
+        node.dx = nodeWidth;        
         node.sourceLinks.forEach(function(link) {
           nextNodes.push(link.target);
         });
@@ -210,7 +208,8 @@ d3.sankey = function() {
       nodesByBreadth.forEach(function(nodes) {
         nodes.forEach(function(node, i) {
           node.y = i;
-          node.dy = node.value * ky;
+          if (units === "MtCO2") node.dy = node.value * ky;
+          else node.dy = nodeWidth/8;
         });
       });
  

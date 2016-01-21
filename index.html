@@ -141,6 +141,8 @@ Data based on the latest 2014 figures available at the <a href='http://www.globa
 <script src="d3.v3.min.js"></script>
 <script src="sankey.js"></script>
 <script>
+
+var units;
   
 var margin = {top: 10, right: 10, bottom: 10, left: 10},
     width = 1200 - margin.left - margin.right,
@@ -168,7 +170,7 @@ var svg2 = d3.select("#sortCol").append("svg")
  
 // Set the sankey diagram properties
 var sankey = d3.sankey()
-    .nodeWidth(20)
+    //.nodeWidth(20)
     .nodePadding(10)
     .size([width, height]);
  
@@ -358,7 +360,10 @@ function make(graph){
 // add the rectangles for the nodes
   node.append("rect")
       .attr("height", function(d) { return d.dy; })
-      .attr("width", sankey.nodeWidth())
+      .attr("width", function(d) {
+        if (units === "MtCO2") return sankey.nodeWidth();
+        else return d.value;
+      })
       .style("fill", function(d) { 
     	if (Europe.indexOf(d.name) != -1) return Europe_color 
         else if (NorthAmerica.indexOf(d.name) != -1) return NorthAmerica_color
