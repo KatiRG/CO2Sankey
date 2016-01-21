@@ -70,7 +70,7 @@
 {"source": "Gas", "target": "Middle East", "value": "12.28"},
 {"source": "Gas flaring", "target": "Middle East", "value": "0.21"},
 {"source": "Cement", "target": "Middle East", "value": "0.61"},
-{"source": "Coal", "target": "Central America", "value": "nan"},
+{"source": "Coal", "target": "Central America", "value": "0"},
 {"source": "Oil", "target": "Central America", "value": "3.39"},
 {"source": "Gas", "target": "Central America", "value": "30.85"},
 {"source": "Gas flaring", "target": "Central America", "value": "0.00"},
