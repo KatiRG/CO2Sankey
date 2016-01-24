@@ -63,6 +63,8 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+var legendClicked; //to control legend selections    
+
 d3.csv("data.csv", function(error, data) {
   if (error) throw error;
 
@@ -151,6 +153,9 @@ d3.csv("data.csv", function(error, data) {
       .attr("width", 18)
       .attr("height", 18)
       .style("fill", color)
+      .attr("id", function (d, i) {
+        return "legend-" + i;
+      })
       .on("mouseover",function(){
         d3.select(this).style("cursor", "pointer");
       })
@@ -159,6 +164,13 @@ d3.csv("data.csv", function(error, data) {
         if (d3.select(this).style("opacity") === "1") { //toggle ON
           d3.select(this).style("opacity", 0.5);
           d3.select(this).style("stroke", "black");
+          //turn off any previously made legend selection
+          if (legendClicked) {
+            d3.select("#" + legendClicked).style("opacity", 1);
+            d3.select("#" + legendClicked).style("stroke", "none");          
+          }
+          legendClicked = this.id;
+         
         } else { //toggle OFF
           d3.select(this).style("opacity", 1);
           d3.select(this).style("stroke", "none");
