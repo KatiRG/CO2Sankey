@@ -63,7 +63,8 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var legendClicked; //to control legend selections    
+var legendClicked; //to control legend selections
+var legendClass = []; //store legend classes to select bars in plotSingle()
 
 d3.csv("data.csv", function(error, data) {
   if (error) throw error;
@@ -117,10 +118,15 @@ d3.csv("data.csv", function(error, data) {
           return x(d.mystate)
         })
       .attr("height", function(d) { return y(d.y0) - y(d.y1); })
+      .attr("class", function(d) {
+        classLabel = d.name.replace(/\s/g, ''); //remove spaces
+        return "class" + classLabel;
+      })
       .style("fill", function(d) { return color(d.name); });
 
   state.selectAll("rect")
        .on("mouseover", function(d){
+
           var delta = d.y1 - d.y0;
           var xPos = parseFloat(d3.select(this).attr("x"));
           var yPos = parseFloat(d3.select(this).attr("y"));
@@ -145,7 +151,11 @@ d3.csv("data.csv", function(error, data) {
   var legend = svg.selectAll(".legend")
       .data(color.domain().slice().reverse())
     .enter().append("g")
-      .attr("class", "legend")
+      //.attr("class", "legend")
+      .attr("class", function (d) {
+        legendClass.push(d.replace(/\s/g, '')); //remove spaces
+        return "legend";
+      })
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
   legend.append("rect")
@@ -162,21 +172,25 @@ d3.csv("data.csv", function(error, data) {
       .on("click",function(){
         //toggle click state
         if (d3.select(this).style("opacity") === "1") { //toggle ON
-          d3.select(this).style("opacity", 0.5);
-          d3.select(this).style("stroke", "black");
+          d3.select(this)
+            .style("opacity", 0.5)
+            .style("stroke", "black");
+
+          plotSingle(this);  
+    
           //turn off any previously made legend selection
-          console.log("legendClicked: ", legendClicked)
-          console.log("this.id", this.id)
           if (legendClicked && legendClicked != this.id) {
             console.log("in here")
-            d3.select("#" + legendClicked).style("opacity", 1);
-            d3.select("#" + legendClicked).style("stroke", "none");          
+            d3.select("#" + legendClicked)
+              .style("opacity", 1)
+              .style("stroke", "none");          
           }
           legendClicked = this.id;
          
         } else { //toggle OFF
           d3.select(this).style("opacity", 1);
           d3.select(this).style("stroke", "none");
+          restorePlot();
         }
                                 
       });
@@ -187,6 +201,30 @@ d3.csv("data.csv", function(error, data) {
       .attr("dy", ".35em")
       .style("text-anchor", "end")
       .text(function(d) { return d; });
+
+  function restorePlot() {
+    console.log("restorePlot")
+  }
+
+  function plotSingle(d) {
+    console.log("plotSingle this: ", d)
+    // console.log("legendClicked in fn: ", legendClicked)
+    // console.log("legend: ", legend)
+
+    // legend.forEach(function (d) {
+    //   console.log("d in forEach: ", d3.select("#legend-0").style("opacity"))
+    // })
+
+    console.log("legendClass: ", legendClass)
+
+    idKeep = d.id.split("legend-").pop(); //id number of bar to keep
+    for (i = 0; i < legendClass.length; i++) {
+      if (i != idKeep) {
+        d3.selectAll(".class" + legendClass[i]).style("opacity", 0);
+      }
+    }
+   
+  } 
 
 });
 
