@@ -158,6 +158,9 @@ d3.csv("data.csv", function(error, data) {
       })
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
+  //reverse order to match order in which bars are stacked    
+  legendClassArray = legendClassArray.reverse();
+
   legend.append("rect")
       .attr("x", width - 18)
       .attr("width", 18)
@@ -170,6 +173,8 @@ d3.csv("data.csv", function(error, data) {
         d3.select(this).style("cursor", "pointer");
       })
       .on("click",function(){
+        //legendClassArray.reverse()
+        console.log("legendClassArray: ", legendClassArray)
         //toggle click state
         if (d3.select(this).style("opacity") === "1") { //toggle ON
           d3.select(this)
@@ -210,15 +215,14 @@ d3.csv("data.csv", function(error, data) {
 
     
     class_keep = d.id.split("id").pop();
-   
-    //idx = legendClassArray.length - 1 - legendClassArray.reverse().indexOf(class_keep); //indexOf doesn't work!!
-
-    idx = legendClassArray.reverse().indexOf(class_keep); //indexOf doesn't work!!
-    //console.log("idx to keep: ", legendClassArray.reverse().indexOf(class_keep)) //works but can't save to a var!!
+    idx = legendClassArray.indexOf(class_keep);
    
     for (i = 0; i < legendClassArray.length; i++) {
       if (legendClassArray[i] != class_keep) {
-        d3.selectAll(".class" + legendClassArray[i]).style("opacity", 0);
+        d3.selectAll(".class" + legendClassArray[i])
+          .transition()
+          .duration(1000)
+          .style("opacity", 0);
       }
     }
 
@@ -243,6 +247,7 @@ d3.csv("data.csv", function(error, data) {
       d3.select(d[idx])
         .transition()
         .duration(1000)
+        .delay(750)
         .attr("y", y_new);
    
     })
