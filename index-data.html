@@ -64,7 +64,7 @@ var svg = d3.select("body").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var legendClicked; //to control legend selections
-var legendClass = []; //store legend classes to select bars in plotSingle()
+var legendClassArray = []; //store legend classes to select bars in plotSingle()
 
 d3.csv("data.csv", function(error, data) {
   if (error) throw error;
@@ -153,7 +153,7 @@ d3.csv("data.csv", function(error, data) {
     .enter().append("g")
       //.attr("class", "legend")
       .attr("class", function (d) {
-        legendClass.push(d.replace(/\s/g, '')); //remove spaces
+        legendClassArray.push(d.replace(/\s/g, '')); //remove spaces
         return "legend";
       })
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
@@ -164,7 +164,7 @@ d3.csv("data.csv", function(error, data) {
       .attr("height", 18)
       .style("fill", color)
       .attr("id", function (d, i) {
-        return "legend-" + i;
+        return "id" + d.replace(/\s/g, '');  //"legend-" + i;
       })
       .on("mouseover",function(){
         d3.select(this).style("cursor", "pointer");
@@ -207,22 +207,49 @@ d3.csv("data.csv", function(error, data) {
   }
 
   function plotSingle(d) {
-    console.log("plotSingle this: ", d)
-    // console.log("legendClicked in fn: ", legendClicked)
-    // console.log("legend: ", legend)
 
-    // legend.forEach(function (d) {
-    //   console.log("d in forEach: ", d3.select("#legend-0").style("opacity"))
-    // })
+    
+    class_keep = d.id.split("id").pop();
+   
+    idx = legendClassArray.length - 1 - legendClassArray.reverse().indexOf(class_keep); //indexOf doesn't work!!
+    //console.log("idx to keep: ", legendClassArray.reverse().indexOf(class_keep)) //works but can't save to a var!!
+   
 
-    console.log("legendClass: ", legendClass)
 
-    idKeep = d.id.split("legend-").pop(); //id number of bar to keep
-    for (i = 0; i < legendClass.length; i++) {
-      if (i != idKeep) {
-        d3.selectAll(".class" + legendClass[i]).style("opacity", 0);
-      }
-    }
+   
+
+    // idKeep = d.id.split("legend-").pop(); //id number of bar to keep
+    // keep_class = ".class" + legendClassArray[idKeep];
+    // console.log("keep_class: ", keep_class)
+    // console.log("legendClassArray: ", legendClassArray)
+    // for (i = 0; i < legendClassArray.length; i++) {
+    //   if (i != idKeep) {
+    //     d3.selectAll(".class" + legendClassArray[i]).style("opacity", 0);
+    //   }
+    // }
+
+    // //lower bars to start on x-axis
+    // console.log("idKeep: ", idKeep)
+    state.selectAll("rect").forEach(function (d, i) {
+      
+      //console.log("j: ", j)
+      console.log("d in rect forEach: ", d)
+      console.log("d[idx]: ", d[idx])
+    
+      //get height and y posn of base bar and selected bar
+      h_keep = d3.select(d[idx]).attr("height");
+      y_keep = d3.select(d[idx]).attr("y");
+
+      h_base = d3.select(d[0]).attr("height");
+      y_base = d3.select(d[0]).attr("y");
+
+      h_shift = h_keep - h_base;
+      y_new = y_base - h_shift;
+
+      //reposition selected bars
+      d3.select(d[idx]).attr("y", y_new);
+   
+    })
    
   } 
 
