@@ -165,7 +165,10 @@ d3.csv("data.csv", function(error, data) {
           d3.select(this).style("opacity", 0.5);
           d3.select(this).style("stroke", "black");
           //turn off any previously made legend selection
-          if (legendClicked) {
+          console.log("legendClicked: ", legendClicked)
+          console.log("this.id", this.id)
+          if (legendClicked && legendClicked != this.id) {
+            console.log("in here")
             d3.select("#" + legendClicked).style("opacity", 1);
             d3.select("#" + legendClicked).style("stroke", "none");          
           }
