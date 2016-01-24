@@ -97,8 +97,8 @@ d3.csv("data.csv", function(error, data) {
       .attr("transform", "rotate(-90)")
       .attr("y", 6)
       .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Population");
+      .style("text-anchor", "end");
+      //.text("Population");
 
   var state = svg.selectAll(".state")
       .data(data)
@@ -240,7 +240,10 @@ d3.csv("data.csv", function(error, data) {
       y_new = y_base - h_shift;
 
       //reposition selected bars
-      d3.select(d[idx]).attr("y", y_new);
+      d3.select(d[idx])
+        .transition()
+        .duration(1000)
+        .attr("y", y_new);
    
     })
    
