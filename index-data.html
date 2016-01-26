@@ -75,12 +75,14 @@ var svg = d3.select("body").append("svg")
 var active_link = "0"; //to control legend selections and hover
 var legendClicked; //to control legend selections
 var legendClassArray = []; //store legend classes to select bars in plotSingle()
+var legendClassArray_orig = []; //orig (with spaces)
 var y_orig; //to store original y-posn
 
 //disable sort checkbox
 d3.select("label")             
   .select("input")
-  .property("disabled", true); 
+  .property("disabled", true)
+  .property("checked", false); 
 
 d3.csv("data.csv", function(error, data) {
   if (error) throw error;
@@ -92,11 +94,18 @@ d3.csv("data.csv", function(error, data) {
     var y0 = 0;
     //d.ages = color.domain().map(function(name) { return {name: name, y0: y0, y1: y0 += +d[name]}; });
     d.ages = color.domain().map(function(name) { return {mystate:mystate, name: name, y0: y0, y1: y0 += +d[name]}; });
-    d.total = d.ages[d.ages.length - 1].y1;
+    d.total = d.ages[d.ages.length - 1].y1;    
 
   });
 
+  //Sort totals in descending order
   data.sort(function(a, b) { return b.total - a.total; });
+  console.log("first data sort: ", data.sort(function(a, b) { return b.total - a.total; }))
+  //Store order of states for later restoring original order in individual category plots
+  xaxis_order = [];
+  data.forEach(function (d, i) {    
+    xaxis_order.push(d.State);
+  })  
 
   x.domain(data.map(function(d) { return d.State; }));
   y.domain([0, d3.max(data, function(d) { return d.total; })]);
@@ -170,12 +179,14 @@ d3.csv("data.csv", function(error, data) {
       //.attr("class", "legend")
       .attr("class", function (d) {
         legendClassArray.push(d.replace(/\s/g, '')); //remove spaces
+        legendClassArray_orig.push(d); //remove spaces
         return "legend";
       })
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
   //reverse order to match order in which bars are stacked    
   legendClassArray = legendClassArray.reverse();
+  legendClassArray_orig = legendClassArray_orig.reverse();
 
   legend.append("rect")
       .attr("x", width - 18)
@@ -209,7 +220,7 @@ d3.csv("data.csv", function(error, data) {
               if (legendClassArray[i] != active_link) {
                 d3.select("#id" + legendClassArray[i])
                   .style("opacity", 0.5);
-              }
+              } else sortBy = i; //save index for sorting in change()
             }
 
             //enable sort checkbox
@@ -321,9 +332,60 @@ d3.csv("data.csv", function(error, data) {
    
   }
 
+  //http://bl.ocks.org/mbostock/3885705
   function change() {
     console.log("sort!!! ", this)
-    console.log("this.checked: ", this.checked)
+    console.log("this.checked: ", this.checked)    
+    console.log("sortBy: ", sortBy)
+    console.log("legendClassArray_orig: ", legendClassArray_orig)
+
+    // var x0 = x.domain(data.sort(this.checked
+    //     ? function(a, b) { return b.frequency - a.frequency; }
+    //     : function(a, b) { return d3.ascending(a.letter, b.letter); })
+    //     .map(function(d) { return d.letter; }))
+    //     .copy();
+
+    colName = legendClassArray_orig[sortBy];
+    console.log("colName: ", colName)
+
+    var x0 = x.domain(data.sort(this.checked
+        ? function(a, b) { return b[colName] - a[colName]; }
+        : function(a, b) { 
+          console.log("todo")
+          //return d3.ascending(a.letter, b.letter); 
+        })
+        .map(function(d) { 
+          console.log("d.State: ", d.State)
+          return d.State; 
+        }))
+        .copy();  
+
+    svg.selectAll(".class" + active_link)
+        .sort(function(a, b) { 
+          console.log("return a: ", x0(a.mystate))
+          return x0(a.mystate) - x0(b.mystate); 
+        });        
+
+    var transition = svg.transition().duration(750),
+        delay = function(d, i) { return i * 50; };
+
+    transition.selectAll(".class" + active_link)
+        .delay(delay)
+        .attr("x", function(d) { return x0(d.mystate); });
+
+    transition.select(".x.axis")
+        .call(xAxis)
+      .selectAll("g")
+        .delay(delay);    
+
+
+
+    // console.log("")
+    // console.log("sorted:",data.sort(function(a, b) { return b[colName] - a[colName]; }))
+
+
+
+
   }
 
 });
