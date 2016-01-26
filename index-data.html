@@ -34,11 +34,12 @@ label {
   position: absolute;
   top: 222px;
   right: 551px;
+  color: #D8D8D8;
 }
 
 </style>
 <body>
-  <label><input type="checkbox" disabled> Sort values</label>
+  <label><input type="checkbox" disabled > Sort values</label>
 
 <script src="d3.v3.min.js"></script>
 <script>
@@ -205,6 +206,10 @@ d3.csv("data.csv", function(error, data) {
                   .style("opacity", 0.5);
               }
             }
+
+            //enable sort checkbox
+            d3.select("label").select("input").property("disabled", false)
+            d3.select("label").style("color", "black")
            
         } else { //deactivate
           if (active_link === this.id.split("id").pop()) {//active square selected; turn it OFF
@@ -222,6 +227,10 @@ d3.csv("data.csv", function(error, data) {
             //restore plot to original
             restorePlot(d);
 
+            //disable sort checkbox
+            d3.select("label").select("input").property("disabled", true)
+            d3.select("label").style("color", "#D8D8D8")
+
           }
 
         } //end active_link check
@@ -235,6 +244,9 @@ d3.csv("data.csv", function(error, data) {
       .attr("dy", ".35em")
       .style("text-anchor", "end")
       .text(function(d) { return d; });
+
+  //sort button
+  //d3.select("input").on("change", change);    
 
   function restorePlot(d) {
 
