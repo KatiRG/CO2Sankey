@@ -99,13 +99,7 @@ d3.csv("data.csv", function(error, data) {
   });
 
   //Sort totals in descending order
-  data.sort(function(a, b) { return b.total - a.total; });
-  console.log("first data sort: ", data.sort(function(a, b) { return b.total - a.total; }))
-  //Store order of states for later restoring original order in individual category plots
-  xaxis_order = [];
-  data.forEach(function (d, i) {    
-    xaxis_order.push(d.State);
-  })  
+  data.sort(function(a, b) { return b.total - a.total; });  
 
   x.domain(data.map(function(d) { return d.State; }));
   y.domain([0, d3.max(data, function(d) { return d.total; })]);
@@ -142,13 +136,7 @@ d3.csv("data.csv", function(error, data) {
       .attr("x",function(d) { //add to stock code
           return x(d.mystate)
         })
-      .attr("height", function(d) { 
-        if (d.mystate === "IL" || d.mystate === "OH") {
-          console.log("state ", d.mystate)
-          console.log("d.y0: ", d.y0)
-          console.log("d.y1: ", d.y1)
-          console.log("delta: ", y(d.y0) - y(d.y1))
-        }
+      .attr("height", function(d) {   
         return y(d.y0) - y(d.y1); 
       })
       .attr("class", function(d) {
@@ -347,34 +335,16 @@ d3.csv("data.csv", function(error, data) {
     console.log("sortBy: ", sortBy)
     console.log("legendClassArray_orig: ", legendClassArray_orig)
 
-    // var x0 = x.domain(data.sort(this.checked
-    //     ? function(a, b) { return b.frequency - a.frequency; }
-    //     : function(a, b) { return d3.ascending(a.letter, b.letter); })
-    //     .map(function(d) { return d.letter; }))
-    //     .copy();
-
     colName = legendClassArray_orig[sortBy];
-    console.log("colName: ", colName)
-    console.log("data: ", data)
 
     var x0 = x.domain(data.sort(this.checked
-        ? function(a, b) {
-          console.log("a[colName]: ", a[colName])
-          return b[colName] - a[colName]; 
-        }
-        : function(a, b) { 
-          console.log("todo")
-          //return d3.ascending(a.letter, b.letter); 
-        })
-        .map(function(d) { 
-          console.log("d.State: ", d)
-          return d.State; 
-        }))
+        ? function(a, b) { return b[colName] - a[colName]; }
+        : function(a, b) { return d3.descending(a.total, b.total); })
+        .map(function(d) { return d.State; }))
         .copy();  
 
     svg.selectAll(".class" + active_link)
-        .sort(function(a, b) { 
-          //console.log("return a: ", x0(a.mystate))
+        .sort(function(a, b) {          
           return x0(a.mystate) - x0(b.mystate); 
         });        
 
@@ -383,24 +353,12 @@ d3.csv("data.csv", function(error, data) {
 
     transition.selectAll(".class" + active_link)
         .delay(delay)
-        .attr("x", function(d) { return x0(d.mystate); })
-        .attr("height", function(d) { 
-          console.log("d in height: ", y(d.y0) - y(d.y1))
-          return y(d.y0) - y(d.y1); 
-        });
-        //.attr("height", function(d) { return x0(d.mystate); });
+        .attr("x", function(d) { return x0(d.mystate); });        
 
     transition.select(".x.axis")
         .call(xAxis)
       .selectAll("g")
-        .delay(delay);    
-
-
-
-    // console.log("")
-    // console.log("sorted:",data.sort(function(a, b) { return b[colName] - a[colName]; }))
-
-
+        .delay(delay);
 
 
   }
