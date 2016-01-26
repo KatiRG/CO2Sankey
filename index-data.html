@@ -39,7 +39,7 @@ label {
 
 </style>
 <body>
-  <label><input type="checkbox" disabled > Sort values</label>
+  <label><input type="checkbox"> Sort values</label>
 
 <script src="d3.v3.min.js"></script>
 <script>
@@ -76,6 +76,11 @@ var active_link = "0"; //to control legend selections and hover
 var legendClicked; //to control legend selections
 var legendClassArray = []; //store legend classes to select bars in plotSingle()
 var y_orig; //to store original y-posn
+
+//disable sort checkbox
+d3.select("label")             
+  .select("input")
+  .property("disabled", true); 
 
 d3.csv("data.csv", function(error, data) {
   if (error) throw error;
@@ -210,6 +215,8 @@ d3.csv("data.csv", function(error, data) {
             //enable sort checkbox
             d3.select("label").select("input").property("disabled", false)
             d3.select("label").style("color", "black")
+            //sort the bars if checkbox is clicked
+            d3.select("input").on("change", change);  
            
         } else { //deactivate
           if (active_link === this.id.split("id").pop()) {//active square selected; turn it OFF
@@ -228,8 +235,11 @@ d3.csv("data.csv", function(error, data) {
             restorePlot(d);
 
             //disable sort checkbox
-            d3.select("label").select("input").property("disabled", true)
-            d3.select("label").style("color", "#D8D8D8")
+            d3.select("label")
+              .style("color", "#D8D8D8")
+              .select("input")
+              .property("disabled", true)
+              .property("checked", false);   
 
           }
 
@@ -244,9 +254,6 @@ d3.csv("data.csv", function(error, data) {
       .attr("dy", ".35em")
       .style("text-anchor", "end")
       .text(function(d) { return d; });
-
-  //sort button
-  //d3.select("input").on("change", change);    
 
   function restorePlot(d) {
 
@@ -312,7 +319,12 @@ d3.csv("data.csv", function(error, data) {
    
     })    
    
-  } 
+  }
+
+  function change() {
+    console.log("sort!!! ", this)
+    console.log("this.checked: ", this.checked)
+  }
 
 });
 
