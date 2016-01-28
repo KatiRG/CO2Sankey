@@ -77,6 +77,7 @@ var legendClicked; //to control legend selections
 var legendClassArray = []; //store legend classes to select bars in plotSingle()
 var legendClassArray_orig = []; //orig (with spaces)
 var y_orig; //to store original y-posn
+var checkbox_status;
 
 
 //disable sort checkbox
@@ -261,7 +262,7 @@ d3.csv("data.csv", function(error, data) {
             //enable sort checkbox
             d3.select("label").select("input").property("disabled", false)
             d3.select("label").style("color", "black")
-            //sort the bars if checkbox is clicked
+            //sort the bars if checkbox is clicked            
             d3.select("input").on("change", change);  
            
         } else { //deactivate
@@ -276,10 +277,7 @@ d3.csv("data.csv", function(error, data) {
                 d3.select("#id" + legendClassArray[i])
                   .style("opacity", 1);
             }
-
-            //restore plot to original
-            restorePlot(d);
-
+ 
             //disable sort checkbox
             d3.select("label")
               .style("color", "#D8D8D8")
@@ -287,6 +285,11 @@ d3.csv("data.csv", function(error, data) {
               .property("disabled", true)
               .property("checked", false);   
 
+            //sort bars back to original positions
+            change();  
+
+            //restore plot to original
+            restorePlot(d);
           }
 
         } //end active_link check
@@ -302,7 +305,10 @@ d3.csv("data.csv", function(error, data) {
       .text(function(d) { return d; });
 
   // restore graph after a single selection
-  function restorePlot(d) {    
+  function restorePlot(d) {
+  
+
+    //if checkbox selection remains true, make it false
 
     state.selectAll("rect").forEach(function (d, i) {      
       //restore shifted bars to original posn
@@ -375,9 +381,13 @@ d3.csv("data.csv", function(error, data) {
   //http://bl.ocks.org/mbostock/3885705
   function change() {    
 
+    if (this.checked) checkbox_status = this.checked
+    else checkbox_status = d3.select("label").select("input").property("checked");
+    console.log("checkbox_status: ", checkbox_status)
+
     colName = legendClassArray_orig[sortBy];
 
-    var x0 = x.domain(data.sort(this.checked
+    var x0 = x.domain(data.sort(checkbox_status
         ? function(a, b) { return b[colName] - a[colName]; }
         : function(a, b) { return b.total - a.total; })
         .map(function(d,i) { return d.State; }))
