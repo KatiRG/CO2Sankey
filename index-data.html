@@ -77,7 +77,7 @@ var legendClicked; //to control legend selections
 var legendClassArray = []; //store legend classes to select bars in plotSingle()
 var legendClassArray_orig = []; //orig (with spaces)
 var y_orig; //to store original y-posn
-var mystate_orig = []; //store to get back original order of states
+var dict_coords;
 
 
 //disable sort checkbox
@@ -154,8 +154,7 @@ d3.csv("data.csv", function(error, data) {
     .enter().append("rect")      
       .attr("width", x.rangeBand())
       .attr("y", function(d) { return y(d.y1); })
-      .attr("x",function(d) { //add to stock code      
-          mystate_orig.push(d.mystate);
+      .attr("x",function(d) { //add to stock code          
           return x(d.mystate)
         })
       .attr("height", function(d) {   
@@ -166,15 +165,6 @@ d3.csv("data.csv", function(error, data) {
         return "class" + " bar " + "class" + classLabel;
       })
       .style("fill", function(d) { return color(d.name); });
-
-  //find unique values in mystate_orig
-  function onlyUnique(value, index, self) { 
-      return self.indexOf(value) === index;
-  }
-  mystate_orig = mystate_orig.filter(onlyUnique);
-  console.log("mystate_orig unique: ", mystate_orig)
-
-
 
   state.selectAll("rect")
        .on("mouseover", function(d){
@@ -294,36 +284,37 @@ d3.csv("data.csv", function(error, data) {
       .text(function(d) { return d; });
 
   function restorePlot(d) {    
-    console.log("mystate_orig IN RESTOREPLOT: ", mystate_orig)
 
-    // state.selectAll("rect").forEach(function (d, i) {      
-    //   //restore shifted bars to original posn
-    //   d3.select(d[idx])
-    //     .transition()
-    //     .duration(1000)        
-    //     .attr("y", y_orig[i]);
-    // })
-  console.log("d3 selectAll(.sorted): ")
+    if (d3.select(".sorted")[0][0] == null) { //bars have never been sorted
+      state.selectAll("rect").forEach(function (d, i) {      
+        //restore shifted bars to original posn
+        d3.select(d[idx])
+          .transition()
+          .duration(1000)        
+          .attr("y", y_orig[i]);
+      })
+    } else { //bars have been sorted
+      svg.selectAll(".sorted").forEach(function (d, i) {        
 
-    console.log("y_orig: ", y_orig)
-    console.log("x_orig: ", x_orig)    
-    state.selectAll(".sorted").forEach(function (d, i) {      
-      if (d.length > 0) {
-        for (k = 0; k < d.length; k++) {         
+        for (k = 0; k < d.length; k++) {          
+          x_here = d3.select(d[k]).attr("x");
+
+          for (key = 0; key < dict_coords.length; key++){
+            if (dict_coords[key].x_orig === x_here) {             
+              y_shift = dict_coords[key].y_orig;
+            }            
+          } //end dictionary lookup
+
+          //apply orig y_coord to bars in the CORRECT order
           d3.select(d[k])
-            // .attr("x", function (d) {
-            //   console.log("x0(d.mystate) in restore: ", x0(d.mystate))
-            //   return x0(d.mystate);
-            // })
-            //.sort(function(a, b) { return b.x - a.x; })
-            .attr("y", function (d) {
-              console.log("y now: ", y[k])
-              console.log("y orig[k]: ", y_orig[k])
-              return y_orig[k];
-            });            
-        }
-      }
-    })
+            .transition()
+            .duration(1000)        
+            .attr("y", y_shift);
+
+        } //end loop through d         
+      }) //end forEach through .sorted bars
+
+    }
 
     //restore opacity of erased bars
     for (i = 0; i < legendClassArray.length; i++) {
@@ -351,23 +342,25 @@ d3.csv("data.csv", function(error, data) {
         d3.selectAll(".class" + legendClassArray[i])
           .transition()
           .duration(1000)          
-          .style("opacity", 0.3);
+          .style("opacity", 0);
       }
     }
 
     //lower the bars to start on x-axis
-    y_orig = []; //height_select = [];
-    x_orig = [];
-    h_orig = [];
+    dict_coords = []; // create an empty array
+    y_orig = []; //height_select = [];    
     state.selectAll("rect").forEach(function (d, i) {        
     
       //get height and y posn of base bar and selected bar
       h_keep = d3.select(d[idx]).attr("height");
       y_keep = d3.select(d[idx]).attr("y");
       //store y_base in array to restore plot
-      y_orig.push(y_keep);
-      x_orig.push(d3.select(d[idx]).attr("x"));
-      h_orig.push(d3.select(d[idx]).attr("height"));
+      dict_coords.push({        
+        x_orig: d3.select(d[idx]).attr("x"),
+        y_orig: d3.select(d[idx]).attr("y")
+      });
+ 
+      y_orig.push(y_keep);      
 
       h_base = d3.select(d[0]).attr("height");
       y_base = d3.select(d[0]).attr("y");    
@@ -378,9 +371,9 @@ d3.csv("data.csv", function(error, data) {
       //reposition selected bars
       d3.select(d[idx])
         .transition()
-        // .ease("bounce")
-        // .duration(1000)
-        // .delay(750)
+        .ease("bounce")
+        .duration(1000)
+        .delay(750)
         .attr("y", y_new);
 
       //height_select.push(h_keep);
@@ -402,76 +395,20 @@ d3.csv("data.csv", function(error, data) {
   }
 
   //http://bl.ocks.org/mbostock/3885705
-  function change() {
-    console.log("before change:")
-    // d3.selectAll(".sorted").forEach(function (d, i) {
-    //   console.log(d)
-    //   //data.sort(function(a, b) { return b.total - a.total; });
-    //   console.log("data in here: ", data)
-    //   data.sort(reorder_d);
-    //   console.log("data after reorder_d: ", data)
-    //   // x.domain(data.map(function(d) { 
-    //   //   console.log("d.State: ", d.State)
-    //   //   console.log("mystate_orig: ", mystate_orig)
-    //   //   return d.State; 
-    //   // }));
-    // });
-    d3.selectAll(".sorted")
-      //.data(data.sort(reorder_d))
-      .attr("x", function (d) {
-        console.log("d in x attr: ", d)        
-        console.log("x: ", x)
-        //return x(d.ages[idx].mystate);
-        return x(d.State);
-      });
-
-    console.log("data after sort: ", data)
-    console.log("after sort: ", d3.selectAll(".sorted"))   
-    
-
-    function reorder_d(a,b) {
-      if (a.total > b.total)
-        return -1;
-      else if (a.total < b.total)
-        return 1;
-      else 
-        return 0;
-    }
-
-    // objs.sort(compare);
-    
-
-    // d3.selectAll(".sorted")
-    //   .attr("x", function (d) {
-    //     console.log("this: ", this)
-    //     console.log("d: ", d)
-    //     //return x0(d.mystate);
-    //   });
-      //.sort(function(a, b) { return b.x - a.x; })
+  function change() {    
 
     colName = legendClassArray_orig[sortBy];
 
     var x0 = x.domain(data.sort(this.checked
-        ? function(a, b) {       
-          return b[colName] - a[colName]; 
-        }
-        : function(a, b) {           
-          return b.total - a.total; 
-        })
-        .map(function(d,i) { 
-          console.log("i: ", i)
-          console.log("d: ", d)
-          console.log("d.State: ", d.State)
-          console.log("d.ages: ", d.ages[idx].mystate)
-          //return d.ages[idx].mystate; 
-          return d.State; 
-        }))
+        ? function(a, b) { return b[colName] - a[colName]; }
+        : function(a, b) { return b.total - a.total; })
+        .map(function(d,i) { return d.State; }))
         .copy();
     
     //svg.selectAll(".class" + active_link)
     svg.selectAll(".bar.class" + active_link)
         .attr("class", "sorted")
-        .sort(function(a, b) {          
+        .sort(function(a, b) { 
           return x0(a.mystate) - x0(b.mystate); 
         });        
 
@@ -491,39 +428,11 @@ d3.csv("data.csv", function(error, data) {
         .selectAll("g")
         .delay(delay);
 
-    // transition.selectAll(".class" + active_link)
-    //     .delay(delay)
-    //     .attr("x", function(d) { return x0(d.mystate); });        
-
-    // transition.select(".x.axis")
-    //     .call(xAxis)
-    //   .selectAll("g")
-    //     .delay(delay);
-    console.log("after change:")
-    console.log("this.checked: ", this.checked)
-    d3.selectAll(".sorted").forEach(function (d, i) {
-      console.log(d)
-    });
-
-    // if (this.checked === false) {
-    //   console.log("attempt to rearrange back to orig")
-    //   console.log("before", d3.selectAll(".sorted"))
-      
-    //   d3.selectAll(".sorted")
-    //     .attr("x", function(d, i) {
-    //       console.log("d: ", d)
-    //       console.log("mystate_orig[i]: ", mystate_orig[i])
-    //       console.log("x(mystate_orig): ", x(d[mystate_orig[i]]))
-    //       console.log("x0(d.mystate_orig): ", x0(d[mystate_orig[i]]))
-    //       return x0(d[mystate_orig[i]]); 
-    //     });
-
-
-    //   console.log("after: ", d3.selectAll(".sorted"))
-      
-    // } //end this.checked check
-
-
+   
+    transition.select(".x.axis")
+        .call(xAxis)
+      .selectAll("g")
+        .delay(delay);    
   }
 
 });
