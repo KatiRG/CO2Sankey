@@ -307,6 +307,7 @@ d3.csv("data.csv", function(error, data) {
 
           //apply orig y_coord to bars in the CORRECT order
           d3.select(d[k])
+            .attr("class", "class" + " bar " + "class" + legendClassArray[idx])
             .transition()
             .duration(1000)        
             .attr("y", y_shift);
