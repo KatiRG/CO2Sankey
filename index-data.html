@@ -77,7 +77,6 @@ var legendClicked; //to control legend selections
 var legendClassArray = []; //store legend classes to select bars in plotSingle()
 var legendClassArray_orig = []; //orig (with spaces)
 var y_orig; //to store original y-posn
-var dict_coords;
 
 
 //disable sort checkbox
@@ -147,24 +146,43 @@ d3.csv("data.csv", function(error, data) {
   //     })
   //     .style("fill", function(d) { return color(d.name); });
 
-  state.selectAll(".bar")
+   state.selectAll("rect")
       .data(function(d) {
         return d.ages; 
       })
-    .enter().append("rect")      
+    .enter().append("rect")
       .attr("width", x.rangeBand())
       .attr("y", function(d) { return y(d.y1); })
-      .attr("x",function(d) { //add to stock code          
+      .attr("x",function(d) { //add to stock code
           return x(d.mystate)
         })
       .attr("height", function(d) {   
         return y(d.y0) - y(d.y1); 
       })
-      .attr("class", function(d) {
+      .attr("class", function(d) {        
         classLabel = d.name.replace(/\s/g, ''); //remove spaces
         return "class" + " bar " + "class" + classLabel;
       })
       .style("fill", function(d) { return color(d.name); });
+
+  // state.selectAll(".bar")
+  //     .data(function(d) {
+  //       return d.ages; 
+  //     })
+  //   .enter().append("rect")      
+  //     .attr("width", x.rangeBand())
+  //     .attr("y", function(d) { return y(d.y1); })
+  //     .attr("x",function(d) { //add to stock code          
+  //         return x(d.mystate)
+  //       })
+  //     .attr("height", function(d) {   
+  //       return y(d.y0) - y(d.y1); 
+  //     })
+  //     .attr("class", function(d) {
+  //       classLabel = d.name.replace(/\s/g, ''); //remove spaces
+  //       return "class" + " bar " + "class" + classLabel;
+  //     })
+  //     .style("fill", function(d) { return color(d.name); });
 
   state.selectAll("rect")
        .on("mouseover", function(d){
@@ -283,39 +301,16 @@ d3.csv("data.csv", function(error, data) {
       .style("text-anchor", "end")
       .text(function(d) { return d; });
 
+  // restore graph after a single selection
   function restorePlot(d) {    
 
-    if (d3.select(".sorted")[0][0] == null) { //bars have never been sorted
-      state.selectAll("rect").forEach(function (d, i) {      
-        //restore shifted bars to original posn
-        d3.select(d[idx])
-          .transition()
-          .duration(1000)        
-          .attr("y", y_orig[i]);
-      })
-    } else { //bars have been sorted
-      svg.selectAll(".sorted").forEach(function (d, i) {        
-
-        for (k = 0; k < d.length; k++) {          
-          x_here = d3.select(d[k]).attr("x");
-
-          for (key = 0; key < dict_coords.length; key++){
-            if (dict_coords[key].x_orig === x_here) {             
-              y_shift = dict_coords[key].y_orig;
-            }            
-          } //end dictionary lookup
-
-          //apply orig y_coord to bars in the CORRECT order
-          d3.select(d[k])
-            .attr("class", "class" + " bar " + "class" + legendClassArray[idx])
-            .transition()
-            .duration(1000)        
-            .attr("y", y_shift);
-
-        } //end loop through d         
-      }) //end forEach through .sorted bars
-
-    }
+    state.selectAll("rect").forEach(function (d, i) {      
+      //restore shifted bars to original posn
+      d3.select(d[idx])
+        .transition()
+        .duration(1000)        
+        .attr("y", y_orig[i]);
+    })
 
     //restore opacity of erased bars
     for (i = 0; i < legendClassArray.length; i++) {
@@ -330,6 +325,7 @@ d3.csv("data.csv", function(error, data) {
 
   }
 
+  // plot only a single legend selection
   function plotSingle(d) {
         
     class_keep = d.id.split("id").pop();
@@ -347,20 +343,15 @@ d3.csv("data.csv", function(error, data) {
       }
     }
 
-    //lower the bars to start on x-axis
-    dict_coords = []; // create an empty array
+    //lower the bars to start on x-axis    
     y_orig = []; //height_select = [];    
+    
     state.selectAll("rect").forEach(function (d, i) {        
     
       //get height and y posn of base bar and selected bar
       h_keep = d3.select(d[idx]).attr("height");
       y_keep = d3.select(d[idx]).attr("y");
-      //store y_base in array to restore plot
-      dict_coords.push({        
-        x_orig: d3.select(d[idx]).attr("x"),
-        y_orig: d3.select(d[idx]).attr("y")
-      });
- 
+      //store y_base in array to restore plot     
       y_orig.push(y_keep);      
 
       h_base = d3.select(d[0]).attr("height");
@@ -377,21 +368,7 @@ d3.csv("data.csv", function(error, data) {
         .delay(750)
         .attr("y", y_new);
 
-      //height_select.push(h_keep);
-
-       
-   
     })
-
-
-    // svg.selectAll(".bar.class65YearsandOver")
-    //     .transition()
-    //     .ease("bounce")
-    //     .duration(1000)
-    //     .delay(750)
-    //     .attr("y", function(d, i) {
-    //       return y_new - height_select[i] + 1; 
-    //     });
    
   }
 
@@ -405,23 +382,21 @@ d3.csv("data.csv", function(error, data) {
         : function(a, b) { return b.total - a.total; })
         .map(function(d,i) { return d.State; }))
         .copy();
-    
-    //svg.selectAll(".class" + active_link)
-    svg.selectAll(".bar.class" + active_link)
-        .attr("class", "sorted")
-        .sort(function(a, b) { 
-          return x0(a.mystate) - x0(b.mystate); 
-        });        
 
-    var transition = svg.transition().duration(750),
-        delay = function(d, i) { return i * 50; };
-    
-    //sort bars
-    transition.selectAll(".sorted")
+      state.selectAll(".class" + active_link)
+           .sort(function(a, b) { 
+              return x0(a.mystate) - x0(b.mystate); 
+            });
+
+      var transition = svg.transition().duration(750),
+          delay = function(d, i) { return i * 50; };    
+
+       //sort bars
+      transition.selectAll(".class" + active_link)
         .delay(delay)
         .attr("x", function(d) {      
           return x0(d.mystate); 
-        });  
+        });      
 
     //sort x-labels accordingly    
     transition.select(".x.axis")
