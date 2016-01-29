@@ -316,10 +316,9 @@ d3.csv("data.csv", function(error, data) {
 
   // restore graph after a single selection
   function restorePlot(d) {
-    console.log("in restorePlot()")
-    console.log("restoreXFlag: ", restoreXFlag)  
 
     //restore opacity of erased bars
+    console.log("class_keep: ", class_keep)
     for (i = 0; i < legendClassArray.length; i++) {
       if (legendClassArray[i] != class_keep) {
         d3.selectAll(".class" + legendClassArray[i])
@@ -334,7 +333,7 @@ d3.csv("data.csv", function(error, data) {
     }
 
     //translate bars back up to original y-posn
-    d3.selectAll(".class65YearsandOver")
+    d3.selectAll(".class" + class_keep)
       .attr("x", function(d) { return x(d.mystate); })
       .transition()
       .duration(1000)
@@ -366,7 +365,7 @@ d3.csv("data.csv", function(error, data) {
     }
 
     //lower the bars to start on x-axis    
-    y_orig = []; //height_select = [];    
+    y_orig = [];
     
     state.selectAll("rect").forEach(function (d, i) {        
     
@@ -395,8 +394,7 @@ d3.csv("data.csv", function(error, data) {
   }
 
   //adapted change() fn in http://bl.ocks.org/mbostock/3885705
-  function change() {    
-    console.log("in change()")
+  function change() {
 
     // if (this.checked) checkbox_status = this.checked
     // else checkbox_status = d3.select("label").select("input").property("checked");
