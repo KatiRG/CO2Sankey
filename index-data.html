@@ -77,7 +77,8 @@ var legendClicked; //to control legend selections
 var legendClassArray = []; //store legend classes to select bars in plotSingle()
 var legendClassArray_orig = []; //orig (with spaces)
 var y_orig; //to store original y-posn
-var checkbox_status;
+var sortDescending; //if true, bars are sorted by height in descending order
+var restoreXFlag = false; //restore order of bars back to original
 
 
 //disable sort checkbox
@@ -162,7 +163,7 @@ d3.csv("data.csv", function(error, data) {
       })
       .attr("class", function(d) {        
         classLabel = d.name.replace(/\s/g, ''); //remove spaces
-        return "class" + " bar " + "class" + classLabel;
+        return "class" + classLabel;
       })
       .style("fill", function(d) { return color(d.name); });
 
@@ -269,14 +270,19 @@ d3.csv("data.csv", function(error, data) {
           if (active_link === this.id.split("id").pop()) {//active square selected; turn it OFF
             d3.select(this)           
               .style("stroke", "none");
-
-            active_link = "0"; //reset
-
+            
             //restore remaining boxes to normal opacity
             for (i = 0; i < legendClassArray.length; i++) {              
                 d3.select("#id" + legendClassArray[i])
                   .style("opacity", 1);
             }
+
+
+            
+            if (d3.select("label").select("input").property("checked")) {              
+              restoreXFlag = true;
+            }
+            
  
             //disable sort checkbox
             d3.select("label")
@@ -285,11 +291,15 @@ d3.csv("data.csv", function(error, data) {
               .property("disabled", true)
               .property("checked", false);   
 
-            //sort bars back to original positions
-            change();  
 
-            //restore plot to original
+            //sort bars back to original positions if necessary
+            change();          
+            //PUT SOME TIMER HERE SO TO WAIT FOR ALL BARS TO BE RE-ORDERED BACK TO ORIG POSN
+
+            //y translate selected category bars back to original y posn
             restorePlot(d);
+
+            active_link = "0"; //reset
           }
 
         } //end active_link check
@@ -306,17 +316,8 @@ d3.csv("data.csv", function(error, data) {
 
   // restore graph after a single selection
   function restorePlot(d) {
-  
-
-    //if checkbox selection remains true, make it false
-
-    state.selectAll("rect").forEach(function (d, i) {      
-      //restore shifted bars to original posn
-      d3.select(d[idx])
-        .transition()
-        .duration(1000)        
-        .attr("y", y_orig[i]);
-    })
+    console.log("in restorePlot()")
+    console.log("restoreXFlag: ", restoreXFlag)  
 
     //restore opacity of erased bars
     for (i = 0; i < legendClassArray.length; i++) {
@@ -324,11 +325,28 @@ d3.csv("data.csv", function(error, data) {
         d3.selectAll(".class" + legendClassArray[i])
           .transition()
           .duration(1000)
-          .delay(750)
+          .delay(function() {
+            if (restoreXFlag) return 3000;
+            else return 750;
+          })
           .style("opacity", 1);
       }
     }
 
+    //translate bars back up to original y-posn
+    d3.selectAll(".class65YearsandOver")
+      .attr("x", function(d) { return x(d.mystate); })
+      .transition()
+      .duration(1000)
+      .delay(function () {
+        if (restoreXFlag) return 2000; //bars have to be restored to orig posn
+        else return 0;
+      })
+      .attr("y", function(d) { return y(d.y1); });
+
+    //reset
+    restoreXFlag = false;
+    
   }
 
   // plot only a single legend selection
@@ -336,9 +354,7 @@ d3.csv("data.csv", function(error, data) {
         
     class_keep = d.id.split("id").pop();
     idx = legendClassArray.indexOf(class_keep);
-
-     
-   
+       
     //erase all but selected bars by setting opacity to 0
     for (i = 0; i < legendClassArray.length; i++) {
       if (legendClassArray[i] != class_keep) {
@@ -378,16 +394,19 @@ d3.csv("data.csv", function(error, data) {
    
   }
 
-  //http://bl.ocks.org/mbostock/3885705
+  //adapted change() fn in http://bl.ocks.org/mbostock/3885705
   function change() {    
+    console.log("in change()")
 
-    if (this.checked) checkbox_status = this.checked
-    else checkbox_status = d3.select("label").select("input").property("checked");
-    console.log("checkbox_status: ", checkbox_status)
+    // if (this.checked) checkbox_status = this.checked
+    // else checkbox_status = d3.select("label").select("input").property("checked");
+
+    if (this.checked) sortDescending = true;
+    else sortDescending = false;
 
     colName = legendClassArray_orig[sortBy];
 
-    var x0 = x.domain(data.sort(checkbox_status
+    var x0 = x.domain(data.sort(sortDescending
         ? function(a, b) { return b[colName] - a[colName]; }
         : function(a, b) { return b.total - a.total; })
         .map(function(d,i) { return d.State; }))
@@ -399,7 +418,7 @@ d3.csv("data.csv", function(error, data) {
             });
 
       var transition = svg.transition().duration(750),
-          delay = function(d, i) { return i * 50; };    
+        delay = function(d, i) { return i * 50; };
 
        //sort bars
       transition.selectAll(".class" + active_link)
