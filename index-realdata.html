@@ -87,6 +87,9 @@ d3.select("label")
   .property("checked", false); 
 
 d3.tsv("MtCO2_byCountry.tsv", function(error, data) {
+//d3.tsv("MtCO2perGDP_byCountry.tsv", function(error, data) {    
+//d3.tsv("MtCO2perPop_byCountry.tsv", function(error, data) {      
+
   if (error) throw error;
 
   color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Country"; }));
