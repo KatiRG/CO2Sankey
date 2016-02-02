@@ -98,7 +98,13 @@ d3.csv("data.csv", function(error, data) {
     d.ages = color.domain().map(function(name) {
       //return { mystate:mystate, name: name, y0: y0, y1: y0 += +d[name]}; });
       return { 
-        mystate:mystate, name: name, y0: y0, y1: y0 += +d[name], value: d[name]}; 
+        mystate:mystate, 
+        name: name, 
+        y0: y0, 
+        y1: y0 += +d[name], 
+        value: d[name],
+        y_corrected: 0
+      }; 
       });
     d.total = d.ages[d.ages.length - 1].y1;    
 
@@ -132,7 +138,7 @@ d3.csv("data.csv", function(error, data) {
       .attr("transform", function(d) { return "translate(" + "0" + ",0)"; });
       //.attr("transform", function(d) { return "translate(" + x(d.State) + ",0)"; })
 
-   height_diff = 0;   
+   height_diff = 0;  //height discrepancy when calculating h based on data vs y(d.y0) - y(d.y1)
    state.selectAll("rect")
       .data(function(d) {
         return d.ages; 
@@ -141,30 +147,19 @@ d3.csv("data.csv", function(error, data) {
       .attr("width", x.rangeBand())
       .attr("y", function(d) {
         height_diff = height_diff + y(d.y0) - y(d.y1) - (y(0) - y(d.value));
+        y_corrected = y(d.y1) + height_diff;
+        d.y_corrected = y_corrected //store in d for later use in restorePlot()
 
-        if (d.mystate === "OH" || d.mystate === "CA") {
-          console.log("d: ", d)
-          console.log("height_diff init: ", height_diff)
- 
-          console.log("this height_diff: ", y(d.y0) - y(d.y1) - (y(0) - y(d.value)))
-          console.log("cumul height diff: ", height_diff )
-          console.log("new y: ", y(d.y1) + height_diff)
-        }
-
-        corrected_y = y(d.y1) + height_diff;
-
-        if (d.name === "65 Years and Over") height_diff = 0; //reset for next mystate
+        if (d.name === "65 Years and Over") height_diff = 0; //reset for next d.mystate
           
-          return corrected_y;               
-        // } else {
-        //    return y(d.y1); 
-        // }
+        return y_corrected;    
+        // return y(d.y1);  //orig, but not accurate  
       })
       .attr("x",function(d) { //add to stock code
           return x(d.mystate)
         })
       .attr("height", function(d) {       
-        //return y(d.y0) - y(d.y1); //heights calculated based on stacked values
+        //return y(d.y0) - y(d.y1); //heights calculated based on stacked values (inaccurate)
         return y(0) - y(d.value); //calculate height directly from value in csv file
       })
       .attr("class", function(d) {        
@@ -323,7 +318,10 @@ d3.csv("data.csv", function(error, data) {
         if (restoreXFlag) return 2000; //bars have to be restored to orig posn
         else return 0;
       })
-      .attr("y", function(d) { return y(d.y1); });
+      .attr("y", function(d) {
+        //return y(d.y1); //not exactly correct since not based on raw data value
+        return d.y_corrected; 
+      });
 
     //reset
     restoreXFlag = false;
