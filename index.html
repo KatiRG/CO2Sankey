@@ -104,6 +104,53 @@
     left: 109px;
     width: 500px;
   }
+
+  /*css for stacked bar charts*/
+  axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+  
+  .bar {
+    fill: steelblue;
+  }
+  
+  .x.axis path {
+    display: none;
+  }
+  
+  div.tooltip2 {
+    position: absolute;
+    padding: 5px;
+    text-align: center;
+    color: #000;
+    background: #AAA;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #000;
+    border-radius: 8px;
+    text-anchor: middle;
+    font-family: sans-serif;
+    font-size: 6px;
+    font-style: italic;
+  }
+  
+  label {
+    position: absolute;
+    top: 222px; /*60px;*/
+    left: 700px;
+    color: #D8D8D8;
+    font: 10px sans-serif;
+  }
+  
+  .grid {
+    stroke: lightgrey;
+    opacity: 0.7;
+    shape-rendering: crispEdges;
+  }
+
 </style>
 
 <body>
@@ -143,12 +190,18 @@
 
         <div id="sortCol"></div>
 
+        <!--html for stacked bar charts-->
+        <label><input type="checkbox"> Sort values</label>
+
         <script src="d3.v3.min.js"></script>
         <script src="sankey.js"></script>
         <script>
           // Sankey diagram with highlight and tooltip
           // http://bost.ocks.org/mike/sankey/
           // http://bl.ocks.org/git-ashish/8959771
+
+          //hide checkbox for stacked bar charts
+          d3.select("label").style("display", "none");
 
           var margin = {
               top: 10,
@@ -253,6 +306,9 @@
                 d3.selectAll(".nytg-navigation li").attr("class", "");
                 //d3.select(this).text("MtCO2");
 
+                //hide checkbox for stacked bar charts
+                d3.select("label").style("display", "none");
+
                 d3.select("#sortButton").text("Sort countries").attr("class", "selected");
                 units = "MtCO2";
                 d3.json("emissions_MtCO2.json", function(error, graph) {
@@ -282,8 +338,10 @@
           d3.select("#TB")
             .on("click", function() {  
                if (d3.select(this).attr("class") === "selected") { //unselect button and show sankey
-                d3.selectAll(".nytg-navigation li").attr("class", "");
-                //d3.select(this).text("MtCO2");
+                d3.selectAll(".nytg-navigation li").attr("class", "");                
+
+                //hide checkbox for stacked bar charts
+                d3.select("label").style("display", "none");
 
                 d3.select("#sortButton").text("Sort countries").attr("class", "selected");
                 units = "MtCO2";
@@ -295,8 +353,7 @@
 
               } else { //select button, clear page, then show stacked bar charts
                 d3.selectAll(".nytg-navigation li").attr("class", "");
-                d3.select(this).attr("class", "selected");
-                //d3.select(this).text("Sankey")
+                d3.select(this).attr("class", "selected");                
 
                 svg.selectAll("*").remove(); //removes Sankey diagram
                 svg2.selectAll("*").remove(); //clears any sort rects displayed
@@ -313,8 +370,10 @@
           d3.select("#TC")
             .on("click", function() {
               if (d3.select(this).attr("class") === "selected") { //unselect button and show sankey
-                d3.selectAll(".nytg-navigation li").attr("class", "");
-                //d3.select(this).text("MtCO2");
+                d3.selectAll(".nytg-navigation li").attr("class", "");                
+
+                //hide checkbox for stacked bar charts
+                d3.select("label").style("display", "none");
 
                 d3.select("#sortButton").text("Sort countries").attr("class", "selected");
                 units = "MtCO2";
@@ -326,8 +385,7 @@
 
               } else { //select button, clear page, then show stacked bar charts
                 d3.selectAll(".nytg-navigation li").attr("class", "");
-                d3.select(this).attr("class", "selected");
-                //d3.select(this).text("Sankey")
+                d3.select(this).attr("class", "selected");                
 
                 svg.selectAll("*").remove(); //removes Sankey diagram
                 svg2.selectAll("*").remove(); //clears any sort rects displayed
@@ -635,6 +693,9 @@
 
           function showStackedBars() {
             console.log("in showStackedBars")
+            //un-hide checkbox for stacked bar charts
+            d3.select("label").style("display", "block");
+
           }
 
         </script>
