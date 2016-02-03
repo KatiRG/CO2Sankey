@@ -235,6 +235,11 @@
             .attr("transform",
               "translate(" + margin.left + "," + margin.top + ")");
 
+          // create svg for stacked bar charts under own ids
+          d3.select("#chart").append("div").attr("id", "TAchart");
+          d3.select("#chart").append("div").attr("id", "TBchart");
+          d3.select("#chart").append("div").attr("id", "TCchart");
+
           // set the sankey diagram properties
           var sankey = d3.sankey()
             .nodeWidth(20)
@@ -684,10 +689,13 @@
 
             if (d3.select("#TA").attr("class") === "selected") {
               fname = "MtCO2_byCountry.tsv";
+              chartdiv = "TAchart";
             } else if (d3.select("#TB").attr("class") === "selected") {
               fname = "MtCO2perGDP_byCountry.tsv";
+              chartdiv = "TBchart";
             } else {
               fname = "MtCO2perPop_byCountry.tsv";
+              chartdiv = "TCchart";
             }
 
             // un-hide checkbox for stacked bar charts but disable it
@@ -744,11 +752,19 @@
               .orient("left")
               .tickFormat(d3.format(".2s"));              
 
-            var svg3 = d3.select("#chart").append("svg")
+            // var svg3 = d3.select("#chart").append("svg")
+            //   .attr("width", width + margin.left + margin.right)
+            //   .attr("height", height + margin.top + margin.bottom)
+            //   .append("g")
+            //   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            // append the svg to the chart div corresponding to the measure selected
+            var svg3 = d3.select("#" + chartdiv).append("svg")
               .attr("width", width + margin.left + margin.right)
               .attr("height", height + margin.top + margin.bottom)
               .append("g")
               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 
             var active_link = "0"; //to control legend selections and hover
             var legendClicked; //to control legend selections
