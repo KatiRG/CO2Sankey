@@ -21,12 +21,20 @@ body {
   display: none;
 }
 
-.tooltip{
-  text-anchor: middle;
-  font-family: sans-serif;
-  font-size: 6px;
-  font-style: italic;
-  fill: #444; 
+div.tooltip {
+position: absolute;
+padding: 5px;
+text-align: center;
+color: #000;
+background: #AAA;
+border-style: solid;
+border-width: 2px;
+border-color: #000;
+border-radius: 8px;
+text-anchor: middle;
+font-family: sans-serif;
+font-size: 6px;
+font-style: italic;
 }
 
 label {
@@ -109,6 +117,9 @@ var legendClassArray_orig = []; //orig (with spaces)
 var sortDescending = false; //if true, bars are sorted by height in descending order
 var restoreXFlag = false; //restore order of bars back to original
 
+var div = d3.select("body").append("div")
+.attr("class", "tooltip")
+.style("opacity", 0);
 
 //disable sort checkbox
 d3.select("label")             
@@ -125,11 +136,16 @@ d3.tsv("MtCO2_byCountry.tsv", function(error, data) {
   color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Country"; }));
 
   data.forEach(function(d) {
-    var mystate = d.Country; //add to stock code
     var y0 = 0;
     d.sources = color.domain().map(function(name) {
       return { 
-        mystate:mystate, name: name, y0: y0, y1: y0 += +d[name], value: d[name]}; 
+        country: d.Country, 
+	name: name, 
+	y0: y0, 
+	y1: y0 += +d[name], 
+	value: d[name],
+	ycoord_corrected: 0
+	}; 
       });
     d.total = d.sources[d.sources.length - 1].y1;    
 
@@ -147,7 +163,7 @@ d3.tsv("MtCO2_byCountry.tsv", function(error, data) {
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
-      .selectAll("text")  		// http://www.d3noob.org/2013/01/how-to-rotate-text-labels-for-x-axis-of.html 
+      .selectAll("text")  // http://www.d3noob.org/2013/01/how-to-rotate-text-labels-for-x-axis-of.html 
             .style("text-anchor", "end")
             .attr("dx", "-.8em")
             .attr("dy", ".15em")
@@ -175,20 +191,33 @@ d3.tsv("MtCO2_byCountry.tsv", function(error, data) {
     .enter().append("g")
       .attr("class", "g");
 
+   height_diff = 0;
    state.selectAll("rect")
       .data(function(d) {
         return d.sources; 
       })
     .enter().append("rect")
       .attr("width", x.rangeBand())
-      .attr("y", function(d) {       
-        return y(d.y1); 
+      .attr("y", function(d) {
+        h_orig = y(d.y0) - y(d.y1); //based on stacked values (inaccurate)
+        h_correct = y(0) - y(d.value); //based on data value in csv file
+        height_diff = height_diff + h_orig - h_correct;
+
+        //correct y-coord y(d.y1) by height_diff
+        ycoord_corrected = y(d.y1) + height_diff;
+        d.ycoord_corrected = ycoord_corrected //store in d for later use in restorePlot()
+
+	if (d.name === "Cement") height_diff = 0; //reset for next set of stacked bars
+          
+        return ycoord_corrected;    
+        // return y(d.y1);  //orig, but not accurate  
+
       })
       .attr("x",function(d) { //add to stock code
-          return x(d.mystate)
+          return x(d.country)
         })
       .attr("height", function(d) {       
-        return y(d.y0) - y(d.y1); //heights calculated based on stacked values
+        return y(0) - y(d.value); //heights calculated based on data value (accurate)
       })
       .attr("class", function(d) {        
         classLabel = d.name.replace(/\s/g, ''); //remove spaces
@@ -197,27 +226,25 @@ d3.tsv("MtCO2_byCountry.tsv", function(error, data) {
       .style("fill", function(d) { return color(d.name); });
 
   state.selectAll("rect")
-       .on("mouseover", function(d){
+       .on("mouseenter", function(d){
 	 if(d3.select(this).style("opacity") != 0){  
           var xPos = parseFloat(d3.select(this).attr("x"));
           var yPos = parseFloat(d3.select(this).attr("y"));
           var height = parseFloat(d3.select(this).attr("height"))
 
-          d3.select(this).attr("stroke","blue").attr("stroke-width",0.8);
+          d3.select(this).attr("stroke","#000").attr("stroke-width",1.0);
 
           format = d3.format("5.1f");
- 
-          svg.append("text")
-          .attr("x",xPos)
-          .attr("y",yPos)
-          .attr("class","tooltip")
-          .text(d.name +": "+ format(d.value)); 
-         } 
-       })
+          div.transition().style("opacity", .9);
+	  div.html(d.country + " / " + d.name + "<br><b>" + format(d.value) + "</b>")
+		.style("left", (d3.event.pageX + 20) + "px")
+		.style("top", (d3.event.pageY - 20) + "px");
+          }
+	})
        .on("mouseout",function(){
-          svg.select(".tooltip").remove();
-          d3.select(this).attr("stroke","pink").attr("stroke-width",0.2);
-        })
+           d3.select(this).attr("stroke","#000").attr("stroke-width",0);
+	   div.transition().style("opacity", 0); 
+        });
 
   var legend = svg.selectAll(".legend")
       .data(color.domain().slice().reverse())
@@ -335,14 +362,17 @@ d3.tsv("MtCO2_byCountry.tsv", function(error, data) {
 
     //translate bars back up to original y-posn
     d3.selectAll(".class" + class_keep)
-      .attr("x", function(d) { return x(d.mystate); })
+      .attr("x", function(d) { return x(d.country); })
       .transition()
       .duration(500)
       .delay(function () {
         if (restoreXFlag) return 1000; //bars have to be restored to orig posn
         else return 0;
       })
-      .attr("y", function(d) { return y(d.y1); });
+      .attr("y", function(d) {
+        //return y(d.y1); //not exactly correct since not based on raw data value
+        return d.ycoord_corrected; 
+      });
 
     //reset
     restoreXFlag = false;
@@ -412,25 +442,24 @@ d3.tsv("MtCO2_byCountry.tsv", function(error, data) {
 
     state.selectAll(".class" + active_link)
          .sort(function(a, b) { 
-            return x0(a.mystate) - x0(b.mystate); 
+            return x0(a.country) - x0(b.country); 
           });
 
-    var transition = svg.transition().duration(750),
-        delay = function(d, i) { return i * 10; };			// If the transition is not speed enough !
+    var transition = svg.transition().duration(500),
+        delay = function(d, i) { return i * 5; };			// If the transition is not speed enough !
 									// another action may be not finished
 
     //sort bars
     transition.selectAll(".class" + active_link)
       .delay(delay)
       .attr("x", function(d) {      
-        return x0(d.mystate); 
+        return x0(d.country); 
       })
       .attr("y", function(d) {     
 	return y(d.value);
       })
       .attr("height", function(d) {      
-	if (sortDescending) return y(0) - y(d.value); 	// when sort we want real bar size
-	else return y(d.y0) - y(d.y1);                  // this is needed by stacked bars
+	return y(0) - y(d.value); 
       });
 
     //sort x-labels accordingly    
