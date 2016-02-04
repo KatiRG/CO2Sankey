@@ -197,19 +197,12 @@
         </ul>
 
         <div id="sortCol"></div>
-
-        <!--html for stacked bar charts-->
-        <!--<label><input type="checkbox"> Sort values</label>-->        
-        <!--end -->
     
         <script src="sankey.js"></script>
         <script>
           // Sankey diagram with highlight and tooltip
           // http://bost.ocks.org/mike/sankey/
-          // http://bl.ocks.org/git-ashish/8959771
-
-          // initially hide html elements for stacked bar charts
-          //d3.select("label").style("display", "none"); //sort values checkbox          
+          // http://bl.ocks.org/git-ashish/8959771              
 
           var margin = {
               top: 10,
@@ -329,25 +322,9 @@
           // histograms button
           d3.select("#TB")
             .on("click", function() {  
-              if (d3.select(this).attr("class") === "selected") { //unselect button and show sankey
-                d3.selectAll(".nytg-navigation li").attr("class", "");
-                //d3.select(this).text("MtCO2");
-
-                d3.select("#chart").selectAll("div").remove(); //remove all stacked bar charts
-                d3.select('#chart').select("svg").style("display", "inline"); //un-hides Sankey diagram              
-
-                d3.select("#sortButton").text("Sort countries").attr("class", "selected");
-                units = "MtCO2";
-                d3.json("emissions_MtCO2.json", function(error, graph) {
-                  svg.selectAll("*").remove();
-                  svg2.selectAll("*").remove(); //clears sort rects
-                  make(graph);
-                })
-
-              } else { // select button, clear page, then show stacked bar charts
-                d3.selectAll(".nytg-navigation li").attr("class", "");
-                d3.select(this).attr("class", "selected");
-                //d3.select(this).text("Sankey")
+             
+                d3.selectAll("#TA").attr("class", "");
+                d3.select(this).attr("class", "selected");                
 
                 d3.select('#chart').select("svg").style("display", "none"); //hides Sankey diagram
                 //d3.select('#chart').select("svg").remove(); //removes Sankey diagram
@@ -355,9 +332,7 @@
                 d3.select("#infotext").style("display", "none"); //hide info text (do not use remove!)
                 d3.select("#sortButton").style("display", "none"); //hides sort button (do not use remove!)
 
-                showStackedBars();
-              }
-
+                showStackedBars();  
             });
 
          
