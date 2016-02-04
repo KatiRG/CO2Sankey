@@ -976,7 +976,8 @@
                     }
 
                     // enable sort checkbox
-                    d3.select("label")
+                    d3.select("#" + whichChart)
+                      .select("label")
                       .style("color", "black")
                       .select("input")
                       .property("disabled", false)
@@ -1000,7 +1001,8 @@
                       }
 
                       // disable sort checkbox
-                      d3.select("label")
+                      d3.select("#" + whichChart)
+                        .select("label")
                         .style("color", "#D8D8D8")
                         .select("input")
                         .property("disabled", true)
@@ -1030,8 +1032,6 @@
 
               // restore graph after a single selection
               function restorePlot(d) {
-                console.log("whichChart: ", whichChart)
-
                 // restore opacity of erased bars    
                 d3.select("#" + whichChart) //select only bars in the specific chart clicked on
                   .selectAll(".bars:not(.class" + class_keep + ")")
@@ -1068,9 +1068,8 @@
 
               // plot only a single legend selection
               function plotSingle(d) {
-                console.log("chartdiv: ", chartdiv)
-                console.log("d in plotSingle: ", d)
-                console.log("d class: ", d3.select(d).attr("class"))
+                // store which chart legend user clicks on for all selections in 
+                // plotSingle() and restorePlot()           
                 whichChart = d3.select(d).attr("class"); //TAchart, TBchart or TCchart
 
                 class_keep = d.id.split("id").pop();
