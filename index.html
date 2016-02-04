@@ -332,7 +332,19 @@
                 d3.select("#infotext").style("display", "none"); //hide info text (do not use remove!)
                 d3.select("#sortButton").style("display", "none"); //hides sort button (do not use remove!)
 
+                fname = "MtCO2_byCountry.tsv";
+                chartdiv = "Mchart";
                 showStackedBars();  
+
+                fname = "MtCO2perGDP_byCountry.tsv";
+                chartdiv = "GDPchart";
+                showStackedBars();
+
+                fname = "MtCO2perPop_byCountry.tsv";
+                chartdiv = "POPchart";
+                showStackedBars();
+
+
             });
 
          
@@ -638,24 +650,26 @@
             // http://bl.ocks.org/katirg/f7d064cd9c3efbc3c360
             // http://bl.ocks.org/mbostock/3886208
             // http://bl.ocks.org/yuuniverse4444/8325617
-            // http://bl.ocks.org/mbostock/3885705          
+            // http://bl.ocks.org/mbostock/3885705
+
+            console.log("fname: ", fname)
 
             chartTitles = {
-              "TAchart": "CO2 emissions (MtCO2)    ",
-              "TBchart": "CO2 emissions (kgCO2/GDP)",
-              "TCchart": "CO2 emissions (tCO2/Capita)"
+              "Mchart": "CO2 emissions (MtCO2)    ",
+              "GDPchart": "CO2 emissions (kgCO2/GDP)",
+              "POPchart": "CO2 emissions (tCO2/Capita)"
             };
 
-            if (d3.select("#TA").attr("class") === "selected") {
-              fname = "MtCO2_byCountry.tsv";
-              chartdiv = "TAchart";
-            } else if (d3.select("#TB").attr("class") === "selected") {
-              fname = "MtCO2perGDP_byCountry.tsv";
-              chartdiv = "TBchart";
-            } else {
-              fname = "MtCO2perPop_byCountry.tsv";
-              chartdiv = "TCchart";
-            }
+            // if (d3.select("#TA").attr("class") === "selected") {
+            //   fname = "MtCO2_byCountry.tsv";
+            //   chartdiv = "Mchart";
+            // } else if (d3.select("#TB").attr("class") === "selected") {
+            //   fname = "MtCO2perGDP_byCountry.tsv";
+            //   chartdiv = "GDPchart";
+            // } else {
+            //   fname = "MtCO2perPop_byCountry.tsv";
+            //   chartdiv = "POPchart";
+            // }
 
             // http://www.d3noob.org/2013/01/adding-grid-lines-to-d3js-graph.html
             function make_x_axis() {
@@ -706,9 +720,9 @@
 
             // if svg exists already, erase it to avoid appending another one.
             // THERE MUST BE A BETTER WAY TO DO THIS??            
-            if (d3.select("#" + chartdiv).select("svg")[0][0]) {
-              d3.select("#" + chartdiv).select("svg").remove();
-            }
+            // if (d3.select("#" + chartdiv).select("svg")[0][0]) {
+            //   d3.select("#" + chartdiv).select("svg").remove();
+            // }
 
             // append the svg to the chart div corresponding to the measure selected            
             var svg3 = d3.select("#chart").append("div").attr("id", chartdiv)
