@@ -152,6 +152,14 @@
     shape-rendering: crispEdges;
   }
 
+  .class_chartTitle {
+    position: relative;
+    top: -520px;
+    left: 330px;
+    width: 500px;
+
+  }
+
 </style>
 
 <body>
@@ -193,7 +201,8 @@
 
         <!--html for stacked bar charts-->
         <label><input type="checkbox"> Sort values</label>
-
+        <!--<h2 id="stackedTitle"> stacked bar chart title</h2>-->
+        <!--end -->
     
         <script src="sankey.js"></script>
         <script>
@@ -201,8 +210,9 @@
           // http://bost.ocks.org/mike/sankey/
           // http://bl.ocks.org/git-ashish/8959771
 
-          // hide checkbox for stacked bar charts
-          d3.select("label").style("display", "none");
+          // initially hide html elements for stacked bar charts
+          d3.select("label").style("display", "none"); //sort values checkbox
+          //d3.select("#stackedTitle").style("display", "none"); //chart title
 
           var margin = {
               top: 10,
@@ -234,11 +244,6 @@
             .append("g")
             .attr("transform",
               "translate(" + margin.left + "," + margin.top + ")");
-
-          // create svg for stacked bar charts under own ids
-          d3.select("#chart").append("div").attr("id", "TAchart");
-          d3.select("#chart").append("div").attr("id", "TBchart");
-          d3.select("#chart").append("div").attr("id", "TCchart");
 
           // set the sankey diagram properties
           var sankey = d3.sankey()
@@ -687,7 +692,13 @@
             // http://bl.ocks.org/katirg/f7d064cd9c3efbc3c360
             // http://bl.ocks.org/mbostock/3886208
             // http://bl.ocks.org/yuuniverse4444/8325617
-            // http://bl.ocks.org/mbostock/3885705  
+            // http://bl.ocks.org/mbostock/3885705          
+
+            chartTitles = {
+              "TAchart": "CO2 emissions (MtCO2)    ",
+              "TBchart": "CO2 emissions (kgCO2/GDP)",
+              "TCchart": "CO2 emissions (tCO2/Capita)"
+            };
 
             if (d3.select("#TA").attr("class") === "selected") {
               fname = "MtCO2_byCountry.tsv";
@@ -698,7 +709,7 @@
             } else {
               fname = "MtCO2perPop_byCountry.tsv";
               chartdiv = "TCchart";
-            }
+            }          
 
             // un-hide checkbox for stacked bar charts but disable it
             d3.select("label")
@@ -767,6 +778,13 @@
               .attr("height", height + margin.top + margin.bottom)
               .append("g")
               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            // add chart title
+            d3.select("#" + chartdiv)
+              .append("div")
+                .attr("class", "class_chartTitle")
+                .append("h2")
+                .text(chartTitles[chartdiv]);            
 
             var active_link = "0"; //to control legend selections and hover
             var legendClicked; //to control legend selections
