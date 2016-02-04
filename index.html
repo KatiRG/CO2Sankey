@@ -139,9 +139,9 @@
   }
   
   label {
-    position: absolute;
-    top: 222px; /*60px;*/
-    left: 700px;
+    position: relative;
+    top: -405px; /*60px;*/
+    left: 868px;
     color: #D8D8D8;
     font: 10px sans-serif;
   }
@@ -200,8 +200,7 @@
         <div id="sortCol"></div>
 
         <!--html for stacked bar charts-->
-        <label><input type="checkbox"> Sort values</label>
-        <!--<h2 id="stackedTitle"> stacked bar chart title</h2>-->
+        <!--<label><input type="checkbox"> Sort values</label>-->        
         <!--end -->
     
         <script src="sankey.js"></script>
@@ -211,8 +210,7 @@
           // http://bl.ocks.org/git-ashish/8959771
 
           // initially hide html elements for stacked bar charts
-          d3.select("label").style("display", "none"); //sort values checkbox
-          //d3.select("#stackedTitle").style("display", "none"); //chart title
+          //d3.select("label").style("display", "none"); //sort values checkbox          
 
           var margin = {
               top: 10,
@@ -712,11 +710,11 @@
             }          
 
             // un-hide checkbox for stacked bar charts but disable it
-            d3.select("label")
-              .style("display", "block")            
-              .select("input")
-              .property("disabled", true)
-              .property("checked", false);
+            // d3.select("label")
+            //   .style("display", "block")            
+            //   .select("input")
+            //   .property("disabled", true)
+            //   .property("checked", false);
 
             // http://www.d3noob.org/2013/01/adding-grid-lines-to-d3js-graph.html
             function make_x_axis() {
@@ -784,7 +782,16 @@
               .append("div")
                 .attr("class", "class_chartTitle")
                 .append("h2")
-                .text(chartTitles[chartdiv]);            
+                .text(chartTitles[chartdiv]);
+
+            // add sort values checkbox and initially disable 
+            d3.select("#" + chartdiv)
+              .append("label")
+              .text("Sort values")
+              .append("input")
+                .attr("type","checkbox")
+              .property("disabled", true)
+              .property("checked", false);          
 
             var active_link = "0"; //to control legend selections and hover
             var legendClicked; //to control legend selections
@@ -797,11 +804,7 @@
               .attr("class", "tooltip")
               .style("opacity", 0);
 
-            //disable sort checkbox
-            d3.select("label")
-              .select("input")
-              .property("disabled", true)
-              .property("checked", false);
+
 
             d3.tsv(fname, function(error, data) {
              
