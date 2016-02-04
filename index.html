@@ -107,7 +107,7 @@
   }
 
   /*css for stacked bar charts*/
-  axis path,
+  .axis path,
   .axis line {
     fill: none;
     stroke: #000;
@@ -316,10 +316,7 @@
                 //d3.select(this).text("MtCO2");
 
                 d3.select("#chart").selectAll("div").remove(); //remove all stacked bar charts
-                d3.select('#chart').select("svg").style("display", "inline"); //un-hides Sankey diagram
-
-                // hide checkbox for stacked bar charts
-                d3.select("label").style("display", "none");
+                d3.select('#chart').select("svg").style("display", "inline"); //un-hides Sankey diagram              
 
                 d3.select("#sortButton").text("Sort countries").attr("class", "selected");
                 units = "MtCO2";
@@ -350,44 +347,41 @@
           // kgCO2/GDP button
           d3.select("#TB")
             .on("click", function() {  
-              if (d3.select(this).attr("class") === "selected") {
-                // unselect kgCO2/GDP button, remove stacked bar chart, and un-hide sankey
-                d3.selectAll(".nytg-navigation li").attr("class", "");                
-                
+              if (d3.select(this).attr("class") === "selected") { //unselect button and show sankey
+                d3.selectAll(".nytg-navigation li").attr("class", "");
+                //d3.select(this).text("MtCO2");
+
                 d3.select("#chart").selectAll("div").remove(); //remove all stacked bar charts
-                d3.select('#chart').select("svg").style("display", "inline"); //un-hide sankey
+                d3.select('#chart').select("svg").style("display", "inline"); //un-hides Sankey diagram              
 
-                // hide sort checkbox for stacked bar charts
-                d3.select("label").style("display", "none");
-
-                // show sort countries button for sankey
                 d3.select("#sortButton").text("Sort countries").attr("class", "selected");
                 units = "MtCO2";
                 d3.json("emissions_MtCO2.json", function(error, graph) {
+                  svg.selectAll("*").remove();
+                  svg2.selectAll("*").remove(); //clears sort rects
                   make(graph);
                 })
 
-              } else { 
-                // select kgCO2/GDP button, hide sankey, remove sort rects,
-                //  hide sankey info text, then show stacked bar charts
+              } else { // select button, clear page, then show stacked bar charts
                 d3.selectAll(".nytg-navigation li").attr("class", "");
                 d3.select(this).attr("class", "selected");
+                //d3.select(this).text("Sankey")
 
-                d3.select('#chart').select("svg").style("display", "none"); //hides sankey
+                d3.select('#chart').select("svg").style("display", "none"); //hides Sankey diagram
+                //d3.select('#chart').select("svg").remove(); //removes Sankey diagram
                 svg2.selectAll("*").remove(); //clears any sort rects displayed
-                d3.select("#infotext").style("display", "none"); //do not use remove!
-                d3.select("#sortButton").style("display", "none"); //do not use remove!
+                d3.select("#infotext").style("display", "none"); //hide info text (do not use remove!)
+                d3.select("#sortButton").style("display", "none"); //hides sort button (do not use remove!)
 
                 showStackedBars();
               }
 
             });
 
-          // // tCO2/person button
+          // tCO2/person button
           // d3.select("#TC")
           //   .on("click", function() {
-
-              
+          //           
           //   });
 
           // load the data
@@ -684,6 +678,7 @@
 
 
           } // end fn make(graph)
+          
 
           function showStackedBars() {
             // Interactive, Sortable Stacked Bar Chart
@@ -825,6 +820,7 @@
                 d["Gasflaring"] = d["Gas flaring"]; // to handle the space
 
               });
+              //console.log("data: ", data)
 
               // sort totals in descending order
               data.sort(function(a, b) { return b.total - a.total; });
@@ -958,7 +954,6 @@
                 .on("click", function(d) {
 
                   if (active_link === "0") { //nothing selected, turn on this selection
-                    console.log("this: ", this)                    
                     // highlight legend square with a box
                     d3.select(this)
                       .style("stroke", "black")
@@ -996,7 +991,7 @@
                           .style("opacity", 1);
                       }
 
-                      if (d3.select("label").select("input").property("checked")) {
+                      if (d3.select("#" + whichChart).select("label").select("input").property("checked")) {
                         restoreXFlag = true;
                       }
 
@@ -1107,7 +1102,7 @@
               }
 
               // adapted change() fn in http://bl.ocks.org/mbostock/3885705
-              function sorting() {
+              function sorting() {                
 
                 if (this.checked) {
                   sortDescending = true;          
@@ -1119,7 +1114,7 @@
                   y.domain([0, d3.max(data, function(d) {
                     return d.total;
                   })]);
-                }
+                }                
 
                 // rescale the y-axis to match range of selected data
                 svg3.select(".y.axis")
