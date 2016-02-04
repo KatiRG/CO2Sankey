@@ -312,8 +312,7 @@
                 d3.selectAll(".nytg-navigation li").attr("class", "");
                 //d3.select(this).text("MtCO2");
 
-                //d3.select('#chart').select("svg").remove(); //removes stacked bar chart
-                d3.select('#chart').selectAll("svg")[0][1].remove(); //remove stacked bar chart
+                d3.select("#chart").selectAll("div").remove(); //remove all stacked bar charts
                 d3.select('#chart').select("svg").style("display", "inline"); //un-hides Sankey diagram
 
                 // hide checkbox for stacked bar charts
@@ -348,31 +347,33 @@
           // kgCO2/GDP button
           d3.select("#TB")
             .on("click", function() {  
-              if (d3.select(this).attr("class") === "selected") { //unselect button and show sankey
+              if (d3.select(this).attr("class") === "selected") {
+                // unselect kgCO2/GDP button, remove stacked bar chart, and un-hide sankey
                 d3.selectAll(".nytg-navigation li").attr("class", "");                
                 
-                d3.select('#chart').selectAll("svg")[0][1].remove(); //remove stacked bar chart
-                d3.select('#chart').select("svg").style("display", "inline"); //un-hides Sankey diagram
+                d3.select("#chart").selectAll("div").remove(); //remove all stacked bar charts
+                d3.select('#chart').select("svg").style("display", "inline"); //un-hide sankey
 
-                // hide checkbox for stacked bar charts
+                // hide sort checkbox for stacked bar charts
                 d3.select("label").style("display", "none");
 
+                // show sort countries button for sankey
                 d3.select("#sortButton").text("Sort countries").attr("class", "selected");
                 units = "MtCO2";
                 d3.json("emissions_MtCO2.json", function(error, graph) {
-                  svg.selectAll("*").remove();
-                  svg2.selectAll("*").remove(); //clears sort rects
                   make(graph);
                 })
 
-              } else { // select button, clear page, then show stacked bar charts
+              } else { 
+                // select kgCO2/GDP button, hide sankey, remove sort rects,
+                //  hide sankey info text, then show stacked bar charts
                 d3.selectAll(".nytg-navigation li").attr("class", "");
-                d3.select(this).attr("class", "selected");                
+                d3.select(this).attr("class", "selected");
 
-                d3.select('#chart').select("svg").style("display", "none"); //hides Sankey diagram                
+                d3.select('#chart').select("svg").style("display", "none"); //hides sankey
                 svg2.selectAll("*").remove(); //clears any sort rects displayed
-                d3.select("#infotext").style("display", "none"); //hide info text (do not use remove!)
-                d3.select("#sortButton").style("display", "none"); //hides sort button (do not use remove!)
+                d3.select("#infotext").style("display", "none"); //do not use remove!
+                d3.select("#sortButton").style("display", "none"); //do not use remove!
 
                 showStackedBars();
               }
@@ -382,6 +383,7 @@
           // // tCO2/person button
           // d3.select("#TC")
           //   .on("click", function() {
+
               
           //   });
 
@@ -750,21 +752,21 @@
             var yAxis = d3.svg.axis()
               .scale(y)
               .orient("left")
-              .tickFormat(d3.format(".2s"));              
+              .tickFormat(d3.format(".2s"));
 
-            // var svg3 = d3.select("#chart").append("svg")
-            //   .attr("width", width + margin.left + margin.right)
-            //   .attr("height", height + margin.top + margin.bottom)
-            //   .append("g")
-            //   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            // if svg exists already, erase it to avoid appending another one.
+            // THERE MUST BE A BETTER WAY TO DO THIS??            
+            if (d3.select("#" + chartdiv).select("svg")[0][0]) {
+              d3.select("#" + chartdiv).select("svg").remove();
+            }
 
-            // append the svg to the chart div corresponding to the measure selected
-            var svg3 = d3.select("#" + chartdiv).append("svg")
+            // append the svg to the chart div corresponding to the measure selected            
+            var svg3 = d3.select("#chart").append("div").attr("id", chartdiv)
+              .append("svg")
               .attr("width", width + margin.left + margin.right)
               .attr("height", height + margin.top + margin.bottom)
               .append("g")
               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 
             var active_link = "0"; //to control legend selections and hover
             var legendClicked; //to control legend selections
