@@ -334,15 +334,15 @@
 
                 fname = "MtCO2_byCountry.tsv";
                 chartdiv = "Mchart";
-                showStackedBars();  
+                showStackedBars(chartdiv);  
 
                 fname = "MtCO2perGDP_byCountry.tsv";
                 chartdiv = "GDPchart";
-                showStackedBars();
+                showStackedBars(chartdiv);
 
                 fname = "MtCO2perPop_byCountry.tsv";
                 chartdiv = "POPchart";
-                showStackedBars();
+                showStackedBars(chartdiv);
 
 
             });
@@ -645,31 +645,19 @@
           } // end fn make(graph)
           
 
-          function showStackedBars() {
+          function showStackedBars(chartdiv) {
             // Interactive, Sortable Stacked Bar Chart
             // http://bl.ocks.org/katirg/f7d064cd9c3efbc3c360
             // http://bl.ocks.org/mbostock/3886208
             // http://bl.ocks.org/yuuniverse4444/8325617
             // http://bl.ocks.org/mbostock/3885705
 
-            console.log("fname: ", fname)
-
+           
             chartTitles = {
               "Mchart": "CO2 emissions (MtCO2)    ",
               "GDPchart": "CO2 emissions (kgCO2/GDP)",
               "POPchart": "CO2 emissions (tCO2/Capita)"
             };
-
-            // if (d3.select("#TA").attr("class") === "selected") {
-            //   fname = "MtCO2_byCountry.tsv";
-            //   chartdiv = "Mchart";
-            // } else if (d3.select("#TB").attr("class") === "selected") {
-            //   fname = "MtCO2perGDP_byCountry.tsv";
-            //   chartdiv = "GDPchart";
-            // } else {
-            //   fname = "MtCO2perPop_byCountry.tsv";
-            //   chartdiv = "POPchart";
-            // }
 
             // http://www.d3noob.org/2013/01/adding-grid-lines-to-d3js-graph.html
             function make_x_axis() {
@@ -718,12 +706,6 @@
               .orient("left")
               .tickFormat(d3.format(".2s"));
 
-            // if svg exists already, erase it to avoid appending another one.
-            // THERE MUST BE A BETTER WAY TO DO THIS??            
-            // if (d3.select("#" + chartdiv).select("svg")[0][0]) {
-            //   d3.select("#" + chartdiv).select("svg").remove();
-            // }
-
             // append the svg to the chart div corresponding to the measure selected            
             var svg3 = d3.select("#chart").append("div").attr("id", chartdiv)
               .append("svg")
@@ -758,18 +740,16 @@
             var div = d3.select("body").append("div")
               .attr("class", "tooltip")
               .style("opacity", 0);
-
-
+              
             // Read in datafile for stacked bar chart  
+            // ======================================            
             d3.tsv(fname, function(error, data) {
-             
-
               if (error) throw error;
 
               color.domain(d3.keys(data[0]).filter(function(key) {
                 return key !== "Country";
               }));
-
+              
               data.forEach(function(d) {
                 var y0 = 0;
                 d.sources = color.domain().map(function(name) {
@@ -786,8 +766,7 @@
 
                 d["Gasflaring"] = d["Gas flaring"]; // to handle the space
 
-              });
-              //console.log("data: ", data)
+              });              
 
               // sort totals in descending order
               data.sort(function(a, b) { return b.total - a.total; });
@@ -821,11 +800,11 @@
                   .tickSize(-width, 0, 0)
                   .tickFormat("")
                 )
-
+              
               var state = svg3.selectAll(".state")
                 .data(data)
                 .enter().append("g")
-                .attr("class", "g");
+                .attr("class", "g");              
 
               height_diff = 0;
               state.selectAll("rect")
@@ -890,7 +869,7 @@
                 .attr("class", function(d) {                  
                   legendClassArray.push(d.replace(/\s/g, '')); //remove spaces
                   legendClassArray_orig.push(d); //remove spaces
-                  return "legend";
+                  return "legend " + chartdiv; //tag which chart legend belongs to
                 })
                 .attr("transform", function(d, i) {
                   return "translate(0," + i * 20 + ")";
@@ -900,12 +879,15 @@
               legendClassArray = legendClassArray.reverse();
               legendClassArray_orig = legendClassArray_orig.reverse();
 
+             
+              //console.log("chartdiv: ", chartdiv)
+
               legend.append("rect")
                 .attr("x", width - 18)
                 .attr("width", 18)
                 .attr("height", 18)
                 .style("fill", color)
-                .attr("class", chartdiv)
+                //.attr("class", chartdiv)
                 .attr("id", function(d, i) {
                   return "id" + d.replace(/\s/g, '');
                 })
@@ -918,7 +900,7 @@
                     } else d3.select(this).style("cursor", "auto");
                   }
                 })
-                .on("click", function(d) {
+                .on("click", function(d) {                   
 
                   if (active_link === "0") { //nothing selected, turn on this selection
                     // highlight legend square with a box
@@ -926,7 +908,9 @@
                       .style("stroke", "black")
                       .style("stroke-width", 2);
 
-                    active_link = this.id.split("id").pop();
+                    active_link = this.id.split("id").pop();                   
+
+                    whichChart = d3.select(this.parentNode).attr("class").split('legend ').pop();
                     plotSingle(this);
 
                     // gray out the others
@@ -946,7 +930,7 @@
                       // sort the bars if checkbox is clicked            
                       .on("change", sorting);
 
-                  } else { // deactivate
+                  } else { // deactivate              
 
                     if (active_link === this.id.split("id").pop()) { //active square selected; turn it OFF
                       d3.select(this)
@@ -994,6 +978,7 @@
 
               // restore graph after a single selection
               function restorePlot(d) {
+    
                 // restore opacity of erased bars    
                 d3.select("#" + whichChart) //select only bars in the specific chart clicked on
                   .selectAll(".bars:not(.class" + class_keep + ")")
@@ -1031,8 +1016,7 @@
               // plot only a single legend selection
               function plotSingle(d) {
                 // store which chart legend user clicks on for all selections in 
-                // plotSingle() and restorePlot()           
-                whichChart = d3.select(d).attr("class"); //TAchart, TBchart or TCchart
+                // plotSingle() and restorePlot()              
 
                 class_keep = d.id.split("id").pop();
                 idx = legendClassArray.indexOf(class_keep);
