@@ -871,39 +871,33 @@
                   div.transition().style("opacity", 0);
                 })
                 .on("click", function(d) { //highlight all bars belonging to same country
-                  // clear any previous highlights
-                  console.log("whichCountry before: ", whichCountry)                
-                  console.log("this parentNode id: ", d3.select(this.parentNode)[0][0].id)
+                  // clear any previous highlights                  
                                     
                   if ( whichCountry != d3.select(this.parentNode)[0][0].id ) {
-                    // clicked country is different from previously clicked country
-                    console.log("another country was highlighted")
-                    // clear previously-highlighted country
-                    // d3.selectAll("." + whichCountry)
-                    //   .selectAll("rect")
-                    //   .attr("stroke", "#000")
-                    //   .attr("stroke-width", 0);
 
-                    whichCountry = d3.select(this.parentNode)[0][0].id;  
-                    console.log("whichCountry before try: ", whichCountry)
-                    console.log("try: ", d3.selectAll("g.Country:not(#" + whichCountry + ")"))
+                    if (whichCountry) {//turn ON                      
+                      whichCountry = d3.select(this.parentNode)[0][0].id;
+                      console.log("select: ", d3.selectAll("#" + whichCountry))
+                      d3.selectAll("#" + whichCountry)
+                        .selectAll("rect")
+                        .style("opacity", 1.0);
+                    }              
+
+                    whichCountry = d3.select(this.parentNode)[0][0].id;                   
 
                     d3.selectAll("g.Country:not(#" + whichCountry + ")")
                       .selectAll('rect')
                       .style("opacity", 0.3);
 
 
-                  } else if ( whichCountry === d3.select(this.parentNode)[0][0].id ) {
-                    console.log("same country clicked")
-                    // restore highlighted rects to orig
+                  } else if ( whichCountry === d3.select(this.parentNode)[0][0].id ) {                    
+                    // restore rects to orig opacity
+                    d3.selectAll("g.Country")
+                      .selectAll('rect')
+                      .style("opacity", 1.0);
                     
-
                     whichCountry = d3.select(this.parentNode).attr("class").split("g ").pop();
-                  }
-
-                  //.selectAll(".bars:not(.class" + class_keep + ")")
-                  
-                   console.log("whichCountry after: ", whichCountry)                  
+                  }                                          
                  
                 });
 
