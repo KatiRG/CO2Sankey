@@ -877,10 +877,7 @@
 
               // reverse order to match order in which bars are stacked    
               legendClassArray = legendClassArray.reverse();
-              legendClassArray_orig = legendClassArray_orig.reverse();
-
-             
-              //console.log("chartdiv: ", chartdiv)
+              legendClassArray_orig = legendClassArray_orig.reverse();                        
 
               legend.append("rect")
                 .attr("x", width - 18)
@@ -932,7 +929,10 @@
 
                   } else { // deactivate              
 
-                    if (active_link === this.id.split("id").pop()) { //active square selected; turn it OFF
+                    if (active_link === this.id.split("id").pop()) { //active square selected; turn OFF
+                      
+                      whichChart = d3.select(this.parentNode).attr("class").split('legend ').pop();
+
                       d3.select(this)
                         .style("stroke", "none");
 
@@ -978,7 +978,9 @@
 
               // restore graph after a single selection
               function restorePlot(d) {
-    
+                class_keep = d.replace(/\s/g, '');
+
+
                 // restore opacity of erased bars    
                 d3.select("#" + whichChart) //select only bars in the specific chart clicked on
                   .selectAll(".bars:not(.class" + class_keep + ")")
@@ -1016,7 +1018,7 @@
               // plot only a single legend selection
               function plotSingle(d) {
                 // store which chart legend user clicks on for all selections in 
-                // plotSingle() and restorePlot()              
+                // plotSingle() and restorePlot()                
 
                 class_keep = d.id.split("id").pop();
                 idx = legendClassArray.indexOf(class_keep);
