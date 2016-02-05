@@ -113,6 +113,10 @@
     stroke: #000;
     shape-rendering: crispEdges;
   }
+
+  .y.axis, .x.axis {
+    font-size: 10px;
+  }
   
   .bar {
     fill: steelblue;
@@ -122,26 +126,10 @@
     display: none;
   }
   
-  /*div.tooltip2 {
-    position: absolute;
-    padding: 5px;
-    text-align: center;
-    color: #000;
-    background: #AAA;
-    border-style: solid;
-    border-width: 2px;
-    border-color: #000;
-    border-radius: 8px;
-    text-anchor: middle;
-    font-family: sans-serif;
-    font-size: 6px;
-    font-style: italic;
-  }*/
-  
   label {
     position: relative;
-    top: -405px; /*60px;*/
     left: 868px;
+    top: -377px;
     color: #D8D8D8;
     font: 10px sans-serif;
   }
@@ -154,8 +142,8 @@
 
   .class_chartTitle {
     position: relative;
-    top: -520px;
-    left: 330px;
+    left: 381px;
+    top: -500px;    
     width: 500px;
 
   }
@@ -652,6 +640,8 @@
             // http://bl.ocks.org/yuuniverse4444/8325617
             // http://bl.ocks.org/mbostock/3885705
 
+            var triptyqueColour = "red"; //colour to highlight selected countries with
+
            
             chartTitles = {
               "Mchart": "CO2 emissions (MtCO2)    ",
@@ -718,7 +708,7 @@
             d3.select("#" + chartdiv)
               .append("div")
                 .attr("class", "class_chartTitle")
-                .append("h2")
+                .append("h4")
                 .text(chartTitles[chartdiv]);
 
             // add sort values checkbox and initially disable 
@@ -799,12 +789,15 @@
                 .call(make_y_axis()
                   .tickSize(-width, 0, 0)
                   .tickFormat("")
-                )
+                )            
               
               var state = svg3.selectAll(".state")
                 .data(data)
                 .enter().append("g")
-                .attr("class", "g");              
+                .attr("class", function (d) {
+                  // tag g node of stacked bars with country name
+                  return "g " + d.Country;
+                });              
 
               height_diff = 0;
               state.selectAll("rect")
@@ -844,12 +837,15 @@
 
               state.selectAll("rect")
                 .on("mouseenter", function(d) {
+                  console.log("this in mouseenter: ", this)
                   if (d3.select(this).style("opacity") != 0) {
                     var xPos = parseFloat(d3.select(this).attr("x"));
                     var yPos = parseFloat(d3.select(this).attr("y"));
                     var height = parseFloat(d3.select(this).attr("height"))
 
-                    d3.select(this).attr("stroke", "#000").attr("stroke-width", 1.0);
+                    if (d3.select(this).attr("stroke") != triptyqueColour) {
+                      d3.select(this).attr("stroke", "#000").attr("stroke-width", 1.0);
+                    }
 
                     format = d3.format("5.1f");
                     div.transition().style("opacity", .9);
@@ -859,8 +855,21 @@
                   }
                 })
                 .on("mouseout", function() {
-                  d3.select(this).attr("stroke", "#000").attr("stroke-width", 0);
+                  console.log("this in mouseout: ", this)
+                  if (d3.select(this).attr("stroke") != triptyqueColour) {
+                    d3.select(this).attr("stroke", "#000").attr("stroke-width", 0);
+                  }
                   div.transition().style("opacity", 0);
+                })
+                .on("click", function(d) { //highlight all bars belonging to same country
+                  console.log("this in click: ", this)
+                  whichCountry = d3.select(this.parentNode).attr("class").split("g ").pop();
+                  console.log("whichCountry: ", whichCountry)
+
+                  
+                  d3.selectAll("." + whichCountry)
+                    .selectAll("rect")
+                    .attr("stroke", triptyqueColour);
                 });
 
               var legend = svg3.selectAll(".legend")
@@ -907,7 +916,7 @@
 
                     active_link = this.id.split("id").pop();                   
 
-                    whichChart = d3.select(this.parentNode).attr("class").split('legend ').pop();
+                    whichChart = d3.select(this.parentNode).attr("class").split("legend ").pop();
                     plotSingle(this);
 
                     // gray out the others
@@ -931,7 +940,7 @@
 
                     if (active_link === this.id.split("id").pop()) { //active square selected; turn OFF
                       
-                      whichChart = d3.select(this.parentNode).attr("class").split('legend ').pop();
+                      whichChart = d3.select(this.parentNode).attr("class").split("legend ").pop();
 
                       d3.select(this)
                         .style("stroke", "none");
