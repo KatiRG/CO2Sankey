@@ -799,7 +799,11 @@
                 .enter().append("g")
                 .attr("class", function (d) {
                   // tag g node of stacked bars with country name
-                  return "g " + d.Country.replace(/\s/g, '');
+                  //return "g " + d.Country.replace(/\s/g, '');
+                  return "g Country";
+                })
+                .attr("id", function (d) {
+                  return "id_" + d.Country.replace(/\s/g, '');
                 });              
 
               // country rects  
@@ -868,31 +872,39 @@
                 })
                 .on("click", function(d) { //highlight all bars belonging to same country
                   // clear any previous highlights
-                  if ( whichCountry != d3.select(this.parentNode).attr("class").split("g ").pop()) {
+                  console.log("whichCountry before: ", whichCountry)                
+                  console.log("this parentNode id: ", d3.select(this.parentNode)[0][0].id)
+                                    
+                  if ( whichCountry != d3.select(this.parentNode)[0][0].id ) {
                     // clicked country is different from previously clicked country
-                    console.log("another country is highlighted")
+                    console.log("another country was highlighted")
                     // clear previously-highlighted country
-                    d3.selectAll("." + whichCountry)
-                      .selectAll("rect")
-                      .attr("stroke", "#000")
-                      .attr("stroke-width", 0);
-                  } else if ( whichCountry === d3.select(this.parentNode).attr("class").split("g ").pop()) {
+                    // d3.selectAll("." + whichCountry)
+                    //   .selectAll("rect")
+                    //   .attr("stroke", "#000")
+                    //   .attr("stroke-width", 0);
+
+                    whichCountry = d3.select(this.parentNode)[0][0].id;  
+                    console.log("whichCountry before try: ", whichCountry)
+                    console.log("try: ", d3.selectAll("g.Country:not(#" + whichCountry + ")"))
+
+                    d3.selectAll("g.Country:not(#" + whichCountry + ")")
+                      .selectAll('rect')
+                      .style("opacity", 0.3);
+
+
+                  } else if ( whichCountry === d3.select(this.parentNode)[0][0].id ) {
                     console.log("same country clicked")
                     // restore highlighted rects to orig
-                    d3.selectAll("." + whichCountry)
-                      .selectAll("rect")
-                      .attr("stroke", "#000")
-                      .attr("stroke-width", 0);
+                    
 
-                    whichCountry = "";  
+                    whichCountry = d3.select(this.parentNode).attr("class").split("g ").pop();
                   }
 
-                  whichCountry = d3.select(this.parentNode).attr("class").split("g ").pop();                  
-
-                  // highlight all rects belonging to whichCountry
-                  d3.selectAll("." + whichCountry)
-                    .selectAll("rect")
-                    .attr("stroke", triptyqueColour);
+                  //.selectAll(".bars:not(.class" + class_keep + ")")
+                  
+                   console.log("whichCountry after: ", whichCountry)                  
+                 
                 });
 
               // legend nodes  
