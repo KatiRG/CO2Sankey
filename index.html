@@ -640,7 +640,8 @@
             // http://bl.ocks.org/yuuniverse4444/8325617
             // http://bl.ocks.org/mbostock/3885705
 
-            var triptyqueColour = "red"; //colour to highlight selected countries with
+            var triptyqueColour = "#FF80AF"; //colour to highlight selected countries with
+            var whichCountry;
 
            
             chartTitles = {
@@ -791,14 +792,16 @@
                   .tickFormat("")
                 )            
               
+              // country nodes
               var state = svg3.selectAll(".state")
                 .data(data)
                 .enter().append("g")
                 .attr("class", function (d) {
                   // tag g node of stacked bars with country name
-                  return "g " + d.Country;
+                  return "g " + d.Country.replace(/\s/g, '');
                 });              
 
+              // country rects  
               height_diff = 0;
               state.selectAll("rect")
                 .data(function(d) {
@@ -835,9 +838,10 @@
                   return color(d.name);
                 });
 
+              // country rects event handlers
               state.selectAll("rect")
                 .on("mouseenter", function(d) {
-                  console.log("this in mouseenter: ", this)
+                  
                   if (d3.select(this).style("opacity") != 0) {
                     var xPos = parseFloat(d3.select(this).attr("x"));
                     var yPos = parseFloat(d3.select(this).attr("y"));
@@ -855,14 +859,25 @@
                   }
                 })
                 .on("mouseout", function() {
-                  console.log("this in mouseout: ", this)
+                  
                   if (d3.select(this).attr("stroke") != triptyqueColour) {
                     d3.select(this).attr("stroke", "#000").attr("stroke-width", 0);
                   }
                   div.transition().style("opacity", 0);
                 })
                 .on("click", function(d) { //highlight all bars belonging to same country
-                  console.log("this in click: ", this)
+                  // clear any previous highlights
+                  if ( whichCountry &&
+                       whichCountry != d3.select(this.parentNode).attr("class").split("g ").pop()) {
+                    // clicked country is different from previously clicked country
+                    console.log("another country is highlighted")
+                    // clear previously-highlighted country
+                    d3.selectAll("." + whichCountry)
+                      .selectAll("rect")
+                      .attr("stroke", "#000")
+                      .attr("stroke-width", 0);
+                  }
+
                   whichCountry = d3.select(this.parentNode).attr("class").split("g ").pop();
                   console.log("whichCountry: ", whichCountry)
 
@@ -872,6 +887,7 @@
                     .attr("stroke", triptyqueColour);
                 });
 
+              // legend nodes  
               var legend = svg3.selectAll(".legend")
                 .data(color.domain().slice().reverse())
                 .enter().append("g")
@@ -888,6 +904,7 @@
               legendClassArray = legendClassArray.reverse();
               legendClassArray_orig = legendClassArray_orig.reverse();                        
 
+              // legend rects
               legend.append("rect")
                 .attr("x", width - 18)
                 .attr("width", 18)
@@ -906,7 +923,7 @@
                     } else d3.select(this).style("cursor", "auto");
                   }
                 })
-                .on("click", function(d) {                   
+                .on("click", function(d) {
 
                   if (active_link === "0") { //nothing selected, turn on this selection
                     // highlight legend square with a box
