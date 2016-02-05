@@ -99,12 +99,13 @@
     top: -816px;
     left: 1263px;
   }
-  #triptyque {
+  
+  /*#triptyque {
     position: absolute;
     top: 68px;
     left: 109px;
     width: 500px;
-  }
+  }*/
 
   /*css for stacked bar charts*/
   .axis path,
@@ -168,10 +169,10 @@
     <!-- Begin page content -->
     <div class="container">
 
-      <p id="triptyque">Toggle to see rankings by total emissions, GDP and population:</p>
+      <!--<p id="triptyque"></p>-->
 
 
-      <ul class="nytg-navigation" style='position: absolute; left: 100px; top: 15px;'>
+      <ul class="nytg-navigation" style='position: absolute; left: 0px; top: 15px;'>
         <li id="TA" class="selected">Sankey flows</li>
         <li id="TB">Histograms</li>        
       </ul>
@@ -640,7 +641,7 @@
             // http://bl.ocks.org/yuuniverse4444/8325617
             // http://bl.ocks.org/mbostock/3885705
 
-            var triptyqueColour = "#FF80AF"; //colour to highlight selected countries with
+            var triptyqueColour = "red"; //colour to highlight selected countries with
             var whichCountry;
 
            
@@ -867,8 +868,7 @@
                 })
                 .on("click", function(d) { //highlight all bars belonging to same country
                   // clear any previous highlights
-                  if ( whichCountry &&
-                       whichCountry != d3.select(this.parentNode).attr("class").split("g ").pop()) {
+                  if ( whichCountry != d3.select(this.parentNode).attr("class").split("g ").pop()) {
                     // clicked country is different from previously clicked country
                     console.log("another country is highlighted")
                     // clear previously-highlighted country
@@ -876,12 +876,20 @@
                       .selectAll("rect")
                       .attr("stroke", "#000")
                       .attr("stroke-width", 0);
+                  } else if ( whichCountry === d3.select(this.parentNode).attr("class").split("g ").pop()) {
+                    console.log("same country clicked")
+                    // restore highlighted rects to orig
+                    d3.selectAll("." + whichCountry)
+                      .selectAll("rect")
+                      .attr("stroke", "#000")
+                      .attr("stroke-width", 0);
+
+                    whichCountry = "";  
                   }
 
-                  whichCountry = d3.select(this.parentNode).attr("class").split("g ").pop();
-                  console.log("whichCountry: ", whichCountry)
+                  whichCountry = d3.select(this.parentNode).attr("class").split("g ").pop();                  
 
-                  
+                  // highlight all rects belonging to whichCountry
                   d3.selectAll("." + whichCountry)
                     .selectAll("rect")
                     .attr("stroke", triptyqueColour);
