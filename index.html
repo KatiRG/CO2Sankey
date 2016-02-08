@@ -202,7 +202,9 @@
         <script>
           // Sankey diagram with highlight and tooltip
           // http://bost.ocks.org/mike/sankey/
-          // http://bl.ocks.org/git-ashish/8959771              
+          // http://bl.ocks.org/git-ashish/8959771
+
+          var whichCountry; //for histograms
 
           var margin = {
               top: 10,
@@ -321,7 +323,7 @@
               }
             });
 
-          // histograms button
+          // Sankey and histogram buttons
           d3.select("#TB")
             .on("click", function() {
               if (d3.select(this).attr("class") != "selected") {
@@ -350,14 +352,11 @@
 
             });
 
-         
-
           // load the data
           units = "MtCO2";
           d3.json("emissions_MtCO2.json", function(error, graph) {
             make(graph);
           });
-
 
           function make(graph) {
             // Display info text for Sankey diagram
@@ -654,9 +653,8 @@
             // http://bl.ocks.org/mbostock/3886208
             // http://bl.ocks.org/yuuniverse4444/8325617
             // http://bl.ocks.org/mbostock/3885705
-
-            var triptyqueColour = "red"; //colour to highlight selected countries with
-            var whichCountry;
+            
+            //var whichCountry;
 
            
             chartTitles = {
@@ -742,6 +740,7 @@
             var legendClassArray_orig = []; //orig (with spaces)
             var sortDescending = false; //if true, bars are sorted by height in descending order
             var restoreXFlag = false; //restore order of bars back to original
+            var fadeOpacity = 0.3; //opacity value for de-selected countries
 
             var div = d3.select("body").append("div")
               .attr("class", "tooltip")
@@ -866,10 +865,6 @@
                     var yPos = parseFloat(d3.select(this).attr("y"));
                     var height = parseFloat(d3.select(this).attr("height"))
 
-                    if (d3.select(this).attr("stroke") != triptyqueColour) {
-                      d3.select(this).attr("stroke", "#000").attr("stroke-width", 1.0);
-                    }
-
                     format = d3.format("5.1f");
                     div.transition().style("opacity", .9);
                     div.html(d.country + " / " + d.name + "<br><b>" + format(d.value) + "</b>")
@@ -877,11 +872,7 @@
                       .style("top", (d3.event.pageY - 20) + "px");
                   }
                 })
-                .on("mouseout", function() {
-                  
-                  if (d3.select(this).attr("stroke") != triptyqueColour) {
-                    d3.select(this).attr("stroke", "#000").attr("stroke-width", 0);
-                  }
+                .on("mouseout", function() {                                  
                   div.transition().style("opacity", 0);
                 })
                 .on("click", function(d) { //highlight all bars belonging to same country
@@ -901,7 +892,7 @@
 
                     d3.selectAll("g.Country:not(#" + whichCountry + ")")
                       .selectAll('rect')
-                      .style("opacity", 0.3);
+                      .style("opacity", fadeOpacity);
 
 
                   } else if ( whichCountry === d3.select(this.parentNode)[0][0].id ) {                    
@@ -1012,6 +1003,7 @@
                       sorting();
 
                       // y translate selected category bars back to original y posn
+                      console.log("whichChart before restorePlot: ", whichChart)
                       restorePlot(d);
 
                       active_link = "0"; //reset
@@ -1032,8 +1024,7 @@
 
               // restore graph after a single selection
               function restorePlot(d) {
-                class_keep = d.replace(/\s/g, '');
-
+                class_keep = d.replace(/\s/g, '');                
 
                 // restore opacity of erased bars    
                 d3.select("#" + whichChart) //select only bars in the specific chart clicked on
@@ -1045,7 +1036,15 @@
                     else return 750;
                   })
                   .attr("width", x.rangeBand()) //restore bar width
-                  .style("opacity", 1);
+                  .style("opacity", function(d) {
+                    if (whichCountry.startsWith("id_")) { //a country is selected
+                      // if (d.country === whichCountry.split("id_").pop()) return 1;
+                      // else return 0.3;
+                      return (d.country === whichCountry.split("id_").pop()) ? 1 : fadeOpacity;
+                    } else return 1; //no country selected                    
+                  });
+
+                d3.selectAll("#" + whichCountry).selectAll(".bars").style("opacity", 1);
 
                 // translate bars back up to original y-posn
                 d3.select("#" + whichChart) //select only bars in the specific chart clicked on
