@@ -100,13 +100,6 @@
     left: 1263px;
   }
   
-  /*#triptyque {
-    position: absolute;
-    top: 68px;
-    left: 109px;
-    width: 500px;
-  }*/
-
   /*css for stacked bar charts*/
   .axis path,
   .axis line {
@@ -129,7 +122,7 @@
   
   label {
     position: relative;
-    left: 868px;
+    left: 665px;
     top: -377px;
     color: #D8D8D8;
     font: 10px sans-serif;
@@ -143,11 +136,32 @@
 
   .class_chartTitle {
     position: relative;
-    left: 381px;
-    top: -500px;    
+    left: 277px;
+    top: -508px;    
     width: 500px;
 
   }
+
+  #Mchart {
+    position: relative;
+    top: 100px;
+    height: 600px;
+  }
+
+  #GDPchart {
+    position: relative;
+    top: -500px;
+    left: 770px;
+    height: 600px;
+  }
+
+  #POPchart {
+    position: relative;
+    top: -580px;
+    left: 394px;
+    height: 600px;
+  }
+
 
 </style>
 
@@ -169,12 +183,9 @@
     <!-- Begin page content -->
     <div class="container">
 
-      <!--<p id="triptyque"></p>-->
-
-
       <ul class="nytg-navigation" style='position: absolute; left: 0px; top: 15px;'>
         <li id="TA" class="selected">Sankey flows</li>
-        <li id="TB">Histograms</li>        
+        <li id="TB">Histograms</li>
       </ul>
 
       <div id="infotext" style="width: 700px;"></div>
@@ -257,7 +268,7 @@
           MiddleEast = ['Middle East', 'Bahrain', 'Iraq', 'Iran', 'Israel', 'Jordan', 'Kuwait', 'Lebanon', 'Occupied Palestinian Territory',
             'Oman', 'Qatar', 'Saudi Arabia', 'Syria', 'Turkey', 'United Arab Emirates', 'Yemen'
           ];
-          NorthAmerica = ['North America', 'Canada', 'Greenland', 'Mexico', 'Saint Pierre and Miquelon', 'United States of America'];
+          NorthAmerica = ['North America', 'Canada', 'Greenland', 'Mexico', 'Saint Pierre and Miquelon', 'USA'];
           Oceania = ['Oceania', 'Australia', 'Cook Islands', 'Micronesia (Federated States of)', 'Fiji', 'French Polynesia',
             'Kiribati', 'Marshall Islands', 'Nauru', 'New Caledonia', 'New Zealand', 'Niue', 'Palau',
             'Samoa', 'Solomon Islands', 'Tonga', 'Vanuatu', 'Wallis and Futuna Islands'
@@ -307,7 +318,7 @@
                   svg2.selectAll("*").remove(); //clears sort rects
                   make(graph);
                 })
-              }                    
+              }
             });
 
           // histograms button
@@ -349,7 +360,7 @@
 
 
           function make(graph) {
-            // Display info text for Sankey diagram           
+            // Display info text for Sankey diagram
 
             d3.select("#infotext").text("This Sankey diagram represents CO2 emissions in MtCO2 from five major sources (left column) and their distibution over region (middle column) and country (right column, 50 highest). China, the US, Europe and India continue to be the world's top emitters in 2014, amounting to 59% of global emissions. 2014 marks the first year in which China’s per capita emissions were larger than those of the EU28.")
                 .style("display", "block");
@@ -534,7 +545,7 @@
                     .filter(function(d) {
                       if (d.x === 1160) { //selects last col (countries)
                         dfilt = d;
-                        ynames[idx] = d.name; //save country names            
+                        ynames[idx] = d.name; //save country names
 
                         var rect = svg2.append("g")
                           .append("rect")
@@ -564,7 +575,7 @@
 
                         idx++;
                       }
-                    }) //end d.x filter    
+                    }) //end d.x filter
 
                   // add text
                   svg2.selectAll("g")
@@ -581,8 +592,8 @@
                     .style("stroke-width", "2px")
                     .style("fill", "#555");
 
-                } //end button toggle check    
-              }); //end 'sort All' button action      
+                } //end button toggle check
+              }); //end 'sort All' button action
 
             //=================================================
             // FUNCTIONS
@@ -670,13 +681,13 @@
             }      
 
             var margin = {
-                top: 150,
+                top: 25,
                 right: 20,
-                bottom: 160,
-                left: 100
+                bottom: 120,
+                left: 50
               },
-              width = 960 - margin.left - margin.right,
-              height = 600 - margin.top - margin.bottom;  
+              width = 760 - margin.left - margin.right,
+              height = 500 - margin.top - margin.bottom;
 
             var x = d3.scale.ordinal()
               .rangeRoundBands([0, width], .1);
@@ -701,7 +712,7 @@
               .orient("left")
               .tickFormat(d3.format(".2s"));
 
-            // append the svg to the chart div corresponding to the measure selected            
+            // append the svg to the chart div corresponding to the measure selected
             var svg3 = d3.select("#chart").append("div").attr("id", chartdiv)
               .append("svg")
               .attr("width", width + margin.left + margin.right)
@@ -723,7 +734,7 @@
               .append("input")
                 .attr("type","checkbox")
               .property("disabled", true)
-              .property("checked", false);          
+              .property("checked", false);
 
             var active_link = "0"; //to control legend selections and hover
             var legendClicked; //to control legend selections
@@ -737,7 +748,7 @@
               .style("opacity", 0);
               
             // Read in datafile for stacked bar chart  
-            // ======================================            
+            // ======================================
             d3.tsv(fname, function(error, data) {
               if (error) throw error;
 
@@ -761,7 +772,7 @@
 
                 d["Gasflaring"] = d["Gas flaring"]; // to handle the space
 
-              });              
+              });
 
               // sort totals in descending order
               data.sort(function(a, b) { return b.total - a.total; });
