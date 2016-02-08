@@ -123,7 +123,7 @@
   label {
     position: relative;
     left: 665px;
-    top: -377px;
+    top: -419px;
     color: #D8D8D8;
     font: 10px sans-serif;
   }
@@ -945,9 +945,11 @@
                 .on("click", function(d) {
 
                   if (active_link === "0") { //nothing selected, turn on this selection
-                    // highlight legend square with a box
+                    // highlight legend square with a box (if coal, use different colour)
                     d3.select(this)
-                      .style("stroke", "black")
+                      .style("stroke", function (d) {                        
+                        return (d === "Coal") ? "#FF80AF" : "black"; 
+                      })
                       .style("stroke-width", 2);
 
                     active_link = this.id.split("id").pop();                   
@@ -1037,10 +1039,11 @@
                   })
                   .attr("width", x.rangeBand()) //restore bar width
                   .style("opacity", function(d) {
-                    if (whichCountry.startsWith("id_")) { //a country is selected
+                    if (whichCountry && whichCountry.startsWith("id_")) { //a country is selected
                       // if (d.country === whichCountry.split("id_").pop()) return 1;
-                      // else return 0.3;
-                      return (d.country === whichCountry.split("id_").pop()) ? 1 : fadeOpacity;
+                      // else return 0.3;                      
+                      return (d.country.replace(/\s/g, '') === whichCountry.split("id_").pop()) 
+                              ? 1 : fadeOpacity;
                     } else return 1; //no country selected                    
                   });
 
