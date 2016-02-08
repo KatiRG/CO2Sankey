@@ -740,6 +740,7 @@
             var legendClassArray_orig = []; //orig (with spaces)
             var sortDescending = false; //if true, bars are sorted by height in descending order
             var restoreXFlag = false; //restore order of bars back to original
+            var fadeOpacity = 0.3; //opacity value for de-selected countries
 
             var div = d3.select("body").append("div")
               .attr("class", "tooltip")
@@ -891,7 +892,7 @@
 
                     d3.selectAll("g.Country:not(#" + whichCountry + ")")
                       .selectAll('rect')
-                      .style("opacity", 0.3);
+                      .style("opacity", fadeOpacity);
 
 
                   } else if ( whichCountry === d3.select(this.parentNode)[0][0].id ) {                    
@@ -1023,15 +1024,7 @@
 
               // restore graph after a single selection
               function restorePlot(d) {
-                class_keep = d.replace(/\s/g, '');
-                console.log("whichCountry in restorePlot: ", whichCountry)
-
-                
-                
-                //keep opacity same as bars in class_keep
-                keepOpacity = d3.select("#Mchart")
-                                .select(".bars" + ".class" + class_keep)
-                                .style("opacity");
+                class_keep = d.replace(/\s/g, '');                
 
                 // restore opacity of erased bars    
                 d3.select("#" + whichChart) //select only bars in the specific chart clicked on
@@ -1044,7 +1037,11 @@
                   })
                   .attr("width", x.rangeBand()) //restore bar width
                   .style("opacity", function(d) {
-                    return keepOpacity;
+                    if (whichCountry.startsWith("id_")) { //a country is selected
+                      // if (d.country === whichCountry.split("id_").pop()) return 1;
+                      // else return 0.3;
+                      return (d.country === whichCountry.split("id_").pop()) ? 1 : fadeOpacity;
+                    } else return 1; //no country selected                    
                   });
 
                 d3.selectAll("#" + whichCountry).selectAll(".bars").style("opacity", 1);
