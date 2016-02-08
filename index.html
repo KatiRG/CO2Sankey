@@ -654,8 +654,7 @@
             // http://bl.ocks.org/mbostock/3886208
             // http://bl.ocks.org/yuuniverse4444/8325617
             // http://bl.ocks.org/mbostock/3885705
-
-            var triptyqueColour = "red"; //colour to highlight selected countries with
+            
             var whichCountry;
 
            
@@ -866,10 +865,6 @@
                     var yPos = parseFloat(d3.select(this).attr("y"));
                     var height = parseFloat(d3.select(this).attr("height"))
 
-                    if (d3.select(this).attr("stroke") != triptyqueColour) {
-                      d3.select(this).attr("stroke", "#000").attr("stroke-width", 1.0);
-                    }
-
                     format = d3.format("5.1f");
                     div.transition().style("opacity", .9);
                     div.html(d.country + " / " + d.name + "<br><b>" + format(d.value) + "</b>")
@@ -877,11 +872,7 @@
                       .style("top", (d3.event.pageY - 20) + "px");
                   }
                 })
-                .on("mouseout", function() {
-                  
-                  if (d3.select(this).attr("stroke") != triptyqueColour) {
-                    d3.select(this).attr("stroke", "#000").attr("stroke-width", 0);
-                  }
+                .on("mouseout", function() {                                  
                   div.transition().style("opacity", 0);
                 })
                 .on("click", function(d) { //highlight all bars belonging to same country
@@ -1033,7 +1024,11 @@
               // restore graph after a single selection
               function restorePlot(d) {
                 class_keep = d.replace(/\s/g, '');
-
+                
+                //keep opacity same as bars in class_keep
+                keepOpacity = d3.select("#Mchart")
+                                .select(".bars" + ".class" + class_keep)
+                                .style("opacity");
 
                 // restore opacity of erased bars    
                 d3.select("#" + whichChart) //select only bars in the specific chart clicked on
@@ -1045,7 +1040,9 @@
                     else return 750;
                   })
                   .attr("width", x.rangeBand()) //restore bar width
-                  .style("opacity", 1);
+                  .style("opacity", function(d) {
+                    return keepOpacity;
+                  });
 
                 // translate bars back up to original y-posn
                 d3.select("#" + whichChart) //select only bars in the specific chart clicked on
