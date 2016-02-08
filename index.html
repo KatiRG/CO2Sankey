@@ -202,7 +202,9 @@
         <script>
           // Sankey diagram with highlight and tooltip
           // http://bost.ocks.org/mike/sankey/
-          // http://bl.ocks.org/git-ashish/8959771              
+          // http://bl.ocks.org/git-ashish/8959771
+
+          var whichCountry; //for histograms
 
           var margin = {
               top: 10,
@@ -321,7 +323,7 @@
               }
             });
 
-          // histograms button
+          // Sankey and histogram buttons
           d3.select("#TB")
             .on("click", function() {
               if (d3.select(this).attr("class") != "selected") {
@@ -350,14 +352,11 @@
 
             });
 
-         
-
           // load the data
           units = "MtCO2";
           d3.json("emissions_MtCO2.json", function(error, graph) {
             make(graph);
           });
-
 
           function make(graph) {
             // Display info text for Sankey diagram
@@ -655,7 +654,7 @@
             // http://bl.ocks.org/yuuniverse4444/8325617
             // http://bl.ocks.org/mbostock/3885705
             
-            var whichCountry;
+            //var whichCountry;
 
            
             chartTitles = {
@@ -1003,6 +1002,7 @@
                       sorting();
 
                       // y translate selected category bars back to original y posn
+                      console.log("whichChart before restorePlot: ", whichChart)
                       restorePlot(d);
 
                       active_link = "0"; //reset
@@ -1024,6 +1024,9 @@
               // restore graph after a single selection
               function restorePlot(d) {
                 class_keep = d.replace(/\s/g, '');
+                console.log("whichCountry in restorePlot: ", whichCountry)
+
+                
                 
                 //keep opacity same as bars in class_keep
                 keepOpacity = d3.select("#Mchart")
@@ -1043,6 +1046,8 @@
                   .style("opacity", function(d) {
                     return keepOpacity;
                   });
+
+                d3.selectAll("#" + whichCountry).selectAll(".bars").style("opacity", 1);
 
                 // translate bars back up to original y-posn
                 d3.select("#" + whichChart) //select only bars in the specific chart clicked on
