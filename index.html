@@ -208,7 +208,7 @@
 
       <p id="chart">
        
-        <ul class="nytg-sort" style='position: absolute; left: 1262px; top: 15px;'>
+        <ul class="nytg-sort" style='position: absolute; left: 1232px; top: -5px;'>
           <li id="sortButton">Sort</li>          
         </ul>
 
@@ -329,7 +329,7 @@
                 d3.select("#chart").selectAll("div").remove(); //remove all stacked bar charts
                 d3.select('#chart').select("svg").style("display", "inline"); //un-hide Sankey
 
-                d3.select("#sortButton").text("Sort").attr("class", "selected");
+                //d3.select("#sortButton").text("Sort").attr("class", "selected");
                 units = "MtCO2";
                 d3.json("emissions_MtCO2.json", function(error, graph) {
                   svg.selectAll("*").remove();
@@ -347,7 +347,6 @@
                 d3.select(this).attr("class", "selected");                
 
                 d3.select('#chart').select("svg").style("display", "none"); //hides Sankey diagram
-                //d3.select('#chart').select("svg").remove(); //removes Sankey diagram
                 svg2.selectAll("*").remove(); //clears any sort rects displayed
                 d3.select("#infotext").style("display", "none"); //hide info text (do not use remove!)
                 d3.select("#sortButton").style("display", "none"); //hides sort button (do not use remove!)
@@ -377,17 +376,13 @@
           function make(graph) {
             // Display info text for Sankey diagram
 
-            d3.select("#infotext").text("This Sankey diagram represents CO2 emissions in MtCO2 from five major sources (left column) and their distibution over region (middle column) and country (right column, 50 highest). China, the US, Europe and India continue to be the world's top emitters in 2014, amounting to 59% of global emissions. 2014 marks the first year in which China’s per capita emissions were larger than those of the EU28.")
-                .style("display", "block");
+            d3.select("#infotext").html("This Sankey diagram represents CO2 emissions in MtCO2 from five major sources (left column) and their distibution over region (middle column) and country (right column, 50 highest). China, the US, Europe and India continue to be the world's top emitters in 2014, amounting to 59% of global emissions." + "<br/>" + "<br/>" + "<p>" + "In this view, the emissions of each country are cumulative across sources. To see the breakdown, click on the Histograms button above.")
+              .style("display", "block");
 
             d3.select("#sortButton").style("display", "inline-block"); //un-hide sort button
 
 
-            // } else if (d3.select("#TB").attr("class")) {
-            //   d3.select("#infotext").text("When CO2 emissions are normalized by GDP, China falls to 4th place in Asia (11th overall) after Turkmenistan, Mongolia and Uzbekistan, and India falls to 7th place (25th overall). Zimbabwe has relatively very low emissions but also a low GDP, therefore it has quite a high kgCO2/GDP ratio. Both China and India have higher kgCO2/GDP ratios than the US (38th overall). Trinidad and Tobago sit at 2nd place when CO2 emissions are normalized by GDP as well as per person.")
-            // } else {
-            //   d3.select("#infotext").text("This Sankey diagram represents CO2 emission flows from five major sources (left column) and their distibution over region (middle column) and country (right column, 50 highest). China, the US, Europe and India continue to be the world's top emitters in 2014, amounting to 59% of global emissions. 2014 marks the first year in which China’s per capita emissions were larger than those of the EU28.")
-            // }
+
 
 
             var nodeMap = {};
@@ -670,13 +665,11 @@
             // http://bl.ocks.org/yuuniverse4444/8325617
             // http://bl.ocks.org/mbostock/3885705
             
-            //var whichCountry;
-
-           
+         
             chartTitles = {
               "Mchart": "CO2 emissions (MtCO2)    ",
               "GDPchart": "CO2 emissions (kgCO2/GDP)",
-              "POPchart": "CO2 emissions (tCO2/Capita)"
+              "POPchart": "CO2 emissions (tCO2/person)"
             };
 
             // http://www.d3noob.org/2013/01/adding-grid-lines-to-d3js-graph.html
@@ -897,8 +890,7 @@
                   if ( whichCountry != d3.select(this.parentNode)[0][0].id ) {
 
                     if (whichCountry) {//turn ON                      
-                      whichCountry = d3.select(this.parentNode)[0][0].id;
-                      console.log("select: ", d3.selectAll("#" + whichCountry))
+                      whichCountry = d3.select(this.parentNode)[0][0].id;                      
                       d3.selectAll("#" + whichCountry)
                         .selectAll("rect")
                         .style("opacity", 1.0);
@@ -1020,8 +1012,7 @@
                       // sort bars back to original positions if necessary
                       sorting();
 
-                      // y translate selected category bars back to original y posn
-                      console.log("whichChart before restorePlot: ", whichChart)
+                      // y translate selected category bars back to original y posn                      
                       restorePlot(d);
 
                       active_link = "0"; //reset
