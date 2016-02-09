@@ -104,7 +104,7 @@
     border-radius: 4px 4px 4px 4px;
   }
 
-  #infotext {
+  #infotext, #infotext2 {
     position: relative;
     top: 115px;
     left: 16px;
@@ -152,7 +152,7 @@
 
   .class_chartTitle {
     position: relative;
-    left: 277px;
+    left: 350px;
     top: -508px;    
     width: 500px;
 
@@ -205,6 +205,7 @@
       </ul>
 
       <div id="infotext" style="width: 700px;"></div>
+      <div id="infotext2" style="width: 700px;"></div>
 
       <p id="chart">
        
@@ -328,6 +329,7 @@
 
                 d3.select("#chart").selectAll("div").remove(); //remove all stacked bar charts
                 d3.select('#chart').select("svg").style("display", "inline"); //un-hide Sankey
+                d3.select("#infotext2").style("display", "none"); //hide histogram info text
 
                 //d3.select("#sortButton").text("Sort").attr("class", "selected");
                 units = "MtCO2";
@@ -376,7 +378,7 @@
           function make(graph) {
             // Display info text for Sankey diagram
 
-            d3.select("#infotext").html("This Sankey diagram represents CO2 emissions in MtCO2 from five major sources (left column) and their distibution over region (middle column) and country (right column, 50 highest). China, the US, Europe and India continue to be the world's top emitters in 2014, amounting to 59% of global emissions." + "<br/>" + "<br/>" + "<p>" + "In this view, the emissions of each country are cumulative across sources. To see the breakdown, click on the Histograms button above.")
+            d3.select("#infotext").html("This Sankey diagram represents CO2 emissions in MtCO2 from five major sources (left column) and their distibution over region (middle column) and country (right column, 50 highest). China, the US, Europe and India continue to be the world's top emitters in 2014, amounting to 59% of global emissions." + "<br/>" + "<br/>" + "<p>" + "In this view, the emissions of each country are cumulative across sources. To see the breakdown, click on the 'Histograms' button above.")
               .style("display", "block");
 
             d3.select("#sortButton").style("display", "inline-block"); //un-hide sort button
@@ -664,12 +666,15 @@
             // http://bl.ocks.org/mbostock/3886208
             // http://bl.ocks.org/yuuniverse4444/8325617
             // http://bl.ocks.org/mbostock/3885705
+
+            d3.select("#infotext2").html("These histograms show the carbon emissions emitted by source for the top-50 emitting countries based on three metrics: MtCO2, kgCO2/GDP and tCO2/person." + "<br/>" + "<br/>" + "<p>" + "Click on a legend category to see the emissions for one specific source, and sort them using the 'Sort values' checkbox. Reclick the legend to restore the plot. Selecting any bar will highlight that country to easily see its rank between metrics. Note that set of top-50 countries is not the same for each chart." + "<br/>" + "<br/>" + "<p>")
+              .style("display", "block");
             
          
             chartTitles = {
-              "Mchart": "CO2 emissions (MtCO2)    ",
-              "GDPchart": "CO2 emissions (kgCO2/GDP)",
-              "POPchart": "CO2 emissions (tCO2/person)"
+              "Mchart": "MtCO2    ",
+              "GDPchart": "kgCO2/GDP",
+              "POPchart": "tCO2/person"
             };
 
             // http://www.d3noob.org/2013/01/adding-grid-lines-to-d3js-graph.html
