@@ -104,7 +104,7 @@
     border-radius: 4px 4px 4px 4px;
   }
 
-  #infotext {
+  #infotext, #infotext2 {
     position: relative;
     top: 115px;
     left: 16px;
@@ -152,7 +152,7 @@
 
   .class_chartTitle {
     position: relative;
-    left: 277px;
+    left: 350px;
     top: -508px;    
     width: 500px;
 
@@ -205,10 +205,11 @@
       </ul>
 
       <div id="infotext" style="width: 700px;"></div>
+      <div id="infotext2" style="width: 700px;"></div>
 
       <p id="chart">
        
-        <ul class="nytg-sort" style='position: absolute; left: 1262px; top: 15px;'>
+        <ul class="nytg-sort" style='position: absolute; left: 1232px; top: -5px;'>
           <li id="sortButton">Sort</li>          
         </ul>
 
@@ -233,7 +234,7 @@
 
           var formatNumber = d3.format(".2f"),
             format = function(d) {
-              return formatNumber(d) + " " + units;
+              return formatNumber(d);
             },
             color = d3.scale.category20();
 
@@ -328,8 +329,9 @@
 
                 d3.select("#chart").selectAll("div").remove(); //remove all stacked bar charts
                 d3.select('#chart').select("svg").style("display", "inline"); //un-hide Sankey
+                d3.select("#infotext2").style("display", "none"); //hide histogram info text
 
-                d3.select("#sortButton").text("Sort").attr("class", "selected");
+                //d3.select("#sortButton").text("Sort").attr("class", "selected");
                 units = "MtCO2";
                 d3.json("emissions_MtCO2.json", function(error, graph) {
                   svg.selectAll("*").remove();
@@ -347,7 +349,6 @@
                 d3.select(this).attr("class", "selected");                
 
                 d3.select('#chart').select("svg").style("display", "none"); //hides Sankey diagram
-                //d3.select('#chart').select("svg").remove(); //removes Sankey diagram
                 svg2.selectAll("*").remove(); //clears any sort rects displayed
                 d3.select("#infotext").style("display", "none"); //hide info text (do not use remove!)
                 d3.select("#sortButton").style("display", "none"); //hides sort button (do not use remove!)
@@ -377,17 +378,13 @@
           function make(graph) {
             // Display info text for Sankey diagram
 
-            d3.select("#infotext").text("This Sankey diagram represents CO2 emissions in MtCO2 from five major sources (left column) and their distibution over region (middle column) and country (right column, 50 highest). China, the US, Europe and India continue to be the world's top emitters in 2014, amounting to 59% of global emissions. 2014 marks the first year in which China’s per capita emissions were larger than those of the EU28.")
-                .style("display", "block");
+            d3.select("#infotext").html("This Sankey diagram represents CO2 emissions in MtCO2 from five major sources (left column) and their distibution over region (middle column) and country (right column, 50 highest). China, the US, Europe and India continue to be the world's top emitters in 2014, amounting to 59% of global emissions." + "<br/>" + "<br/>" + "<p>" + "In this view, the emissions of each country are cumulative across sources. To see the breakdown, click on the 'Histograms' button above.")
+              .style("display", "block");
 
             d3.select("#sortButton").style("display", "inline-block"); //un-hide sort button
 
 
-            // } else if (d3.select("#TB").attr("class")) {
-            //   d3.select("#infotext").text("When CO2 emissions are normalized by GDP, China falls to 4th place in Asia (11th overall) after Turkmenistan, Mongolia and Uzbekistan, and India falls to 7th place (25th overall). Zimbabwe has relatively very low emissions but also a low GDP, therefore it has quite a high kgCO2/GDP ratio. Both China and India have higher kgCO2/GDP ratios than the US (38th overall). Trinidad and Tobago sit at 2nd place when CO2 emissions are normalized by GDP as well as per person.")
-            // } else {
-            //   d3.select("#infotext").text("This Sankey diagram represents CO2 emission flows from five major sources (left column) and their distibution over region (middle column) and country (right column, 50 highest). China, the US, Europe and India continue to be the world's top emitters in 2014, amounting to 59% of global emissions. 2014 marks the first year in which China’s per capita emissions were larger than those of the EU28.")
-            // }
+
 
 
             var nodeMap = {};
@@ -448,7 +445,7 @@
                 div.transition()
                   .style("opacity", .9);
                 div.html(d.source.name + " → " + d.target.name +
-                    "<br><b>" + format(d.value) + "</b>")
+                    "<br><b>" + format(d.value) + " " + units + "</b>")
                   .style("left", (d3.event.pageX) + "px")
                   .style("top", (d3.event.pageY) + "px");
               })
@@ -669,29 +666,24 @@
             // http://bl.ocks.org/mbostock/3886208
             // http://bl.ocks.org/yuuniverse4444/8325617
             // http://bl.ocks.org/mbostock/3885705
-            
-            //var whichCountry;
 
-           
+            d3.select("#infotext2").html("These histograms show the carbon emissions emitted by source for the top-50 emitting countries based on three metrics: MtCO2, kgCO2/GDP and tCO2/person." + "<br/>" + "<br/>" + "<p>" + "Click on a legend category to see the emissions for one specific source, and sort them using the 'Sort values' checkbox. Reclick the legend to restore the plot. Selecting any bar will highlight that country to easily see its rank between metrics. Note that set of top-50 countries is not the same for each chart." + "<br/>" + "<br/>" + "<p>")
+              .style("display", "block");
+            
+         
             chartTitles = {
-              "Mchart": "CO2 emissions (MtCO2)    ",
-              "GDPchart": "CO2 emissions (kgCO2/GDP)",
-              "POPchart": "CO2 emissions (tCO2/Capita)"
+              "Mchart": "MtCO2    ",
+              "GDPchart": "kgCO2/GDP",
+              "POPchart": "tCO2/person"
             };
 
             // http://www.d3noob.org/2013/01/adding-grid-lines-to-d3js-graph.html
-            function make_x_axis() {
-              return d3.svg.axis()
-                .scale(x)
-                .orient("bottom")
-                .ticks(5)
-            }
-
             function make_y_axis() {
               return d3.svg.axis()
                 .scale(y)
                 .orient("left")
-                .ticks(10)
+                .ticks(10);
+                //.tickFormat(10, "5.3f");          
             }      
 
             var margin = {
@@ -799,7 +791,10 @@
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + height + ")")
                 .call(xAxis)
-                .selectAll("text") // http://www.d3noob.org/2013/01/how-to-rotate-text-labels-for-x-axis-of.html 
+                .selectAll("text") //http://www.d3noob.org/2013/01/how-to-rotate-text-labels-for-x-axis-of.html
+                .text(function(d, i) {                  
+                  return d + " " + (i + 1) + ".";
+                })
                 .style("text-anchor", "end")
                 .attr("dx", "-.8em")
                 .attr("dy", ".15em")
@@ -828,7 +823,6 @@
                 .enter().append("g")
                 .attr("class", function (d) {
                   // tag g node of stacked bars with country name
-                  //return "g " + d.Country.replace(/\s/g, '');
                   return "g Country";
                 })
                 .attr("id", function (d) {
@@ -883,7 +877,8 @@
 
                     format = d3.format("5.1f");
                     div.transition().style("opacity", .9);
-                    div.html(d.country + " / " + d.name + "<br><b>" + format(d.value) + "</b>")
+                    div.html(d.country + " / " + d.name + "<br><b>" + format(d.value) + 
+                      " " + chartTitles[chartdiv] + "</b>")
                       .style("left", (d3.event.pageX + 20) + "px")
                       .style("top", (d3.event.pageY - 20) + "px");
                   }
@@ -897,8 +892,7 @@
                   if ( whichCountry != d3.select(this.parentNode)[0][0].id ) {
 
                     if (whichCountry) {//turn ON                      
-                      whichCountry = d3.select(this.parentNode)[0][0].id;
-                      console.log("select: ", d3.selectAll("#" + whichCountry))
+                      whichCountry = d3.select(this.parentNode)[0][0].id;                      
                       d3.selectAll("#" + whichCountry)
                         .selectAll("rect")
                         .style("opacity", 1.0);
@@ -1020,8 +1014,7 @@
                       // sort bars back to original positions if necessary
                       sorting();
 
-                      // y translate selected category bars back to original y posn
-                      console.log("whichChart before restorePlot: ", whichChart)
+                      // y translate selected category bars back to original y posn                      
                       restorePlot(d);
 
                       active_link = "0"; //reset
@@ -1055,9 +1048,7 @@
                   })
                   .attr("width", x.rangeBand()) //restore bar width
                   .style("opacity", function(d) {
-                    if (whichCountry && whichCountry.startsWith("id_")) { //a country is selected
-                      // if (d.country === whichCountry.split("id_").pop()) return 1;
-                      // else return 0.3;                      
+                    if (whichCountry && whichCountry.startsWith("id_")) {//country selected                    
                       return (d.country.replace(/\s/g, '') === whichCountry.split("id_").pop()) 
                               ? 1 : fadeOpacity;
                     } else return 1; //no country selected                    
@@ -1068,9 +1059,7 @@
                 // translate bars back up to original y-posn
                 d3.select("#" + whichChart) //select only bars in the specific chart clicked on
                   .selectAll(".class" + class_keep)
-                  .attr("x", function(d) {
-                    return x(d.country);
-                  })
+                  //.attr("x", function(d) { return x(d.country); })
                   .transition()
                   .duration(500)
                   .delay(function() {
@@ -1184,6 +1173,9 @@
                 transition.select(".x.axis")
                   .call(xAxis)
                   .selectAll("text")
+                  .text(function(d, i) {
+                    return d + " " + (i + 1) + ".";
+                  })
                   .style("text-anchor", "end")
                   .attr("dx", "-.8em")
                   .attr("dy", ".15em")
@@ -1193,15 +1185,9 @@
 
             });
 
-
-
-
-
           } //end showStackedBars()
 
         </script>
-
-
 
         <p style='width: 1000px;'>
           <ul<i><b>Sources:</b> <br> - Data based on the latest 2014 figures available in the <a href='http://www.globalcarbonatlas.org' target="_blank">Global Carbon Atlas</a> <br> - <a href='http://cdiac.ornl.gov/trends/emis/meth_reg.html' target="_blank">CDIAC</a>: Boden, TA, G Marland, and RJ Andres. 2013. Global, Regional, and National Fossil-Fuel CO2 Emissions. Carbon Dioxide Information Analysis Center (CDIAC), Oak Ridge National Laboratory, US Department of Energy, Oak Ridge, Tenn., USA doi:10.3334/CDIAC/00001_V2013
