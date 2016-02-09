@@ -678,13 +678,6 @@
             };
 
             // http://www.d3noob.org/2013/01/adding-grid-lines-to-d3js-graph.html
-            function make_x_axis() {
-              return d3.svg.axis()
-                .scale(x)
-                .orient("bottom")
-                .ticks(5)
-            }
-
             function make_y_axis() {
               return d3.svg.axis()
                 .scale(y)
@@ -797,7 +790,10 @@
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + height + ")")
                 .call(xAxis)
-                .selectAll("text") // http://www.d3noob.org/2013/01/how-to-rotate-text-labels-for-x-axis-of.html 
+                .selectAll("text") //http://www.d3noob.org/2013/01/how-to-rotate-text-labels-for-x-axis-of.html
+                .text(function(d, i) {                  
+                  return d + " " + (i + 1) + ".";
+                })
                 .style("text-anchor", "end")
                 .attr("dx", "-.8em")
                 .attr("dy", ".15em")
@@ -826,7 +822,6 @@
                 .enter().append("g")
                 .attr("class", function (d) {
                   // tag g node of stacked bars with country name
-                  //return "g " + d.Country.replace(/\s/g, '');
                   return "g Country";
                 })
                 .attr("id", function (d) {
@@ -1051,9 +1046,7 @@
                   })
                   .attr("width", x.rangeBand()) //restore bar width
                   .style("opacity", function(d) {
-                    if (whichCountry && whichCountry.startsWith("id_")) { //a country is selected
-                      // if (d.country === whichCountry.split("id_").pop()) return 1;
-                      // else return 0.3;                      
+                    if (whichCountry && whichCountry.startsWith("id_")) {//country selected                    
                       return (d.country.replace(/\s/g, '') === whichCountry.split("id_").pop()) 
                               ? 1 : fadeOpacity;
                     } else return 1; //no country selected                    
@@ -1064,9 +1057,7 @@
                 // translate bars back up to original y-posn
                 d3.select("#" + whichChart) //select only bars in the specific chart clicked on
                   .selectAll(".class" + class_keep)
-                  .attr("x", function(d) {
-                    return x(d.country);
-                  })
+                  //.attr("x", function(d) { return x(d.country); })
                   .transition()
                   .duration(500)
                   .delay(function() {
@@ -1180,6 +1171,9 @@
                 transition.select(".x.axis")
                   .call(xAxis)
                   .selectAll("text")
+                  .text(function(d, i) {
+                    return d + " " + (i + 1) + ".";
+                  })
                   .style("text-anchor", "end")
                   .attr("dx", "-.8em")
                   .attr("dy", ".15em")
@@ -1189,15 +1183,9 @@
 
             });
 
-
-
-
-
           } //end showStackedBars()
 
         </script>
-
-
 
         <p style='width: 1000px;'>
           <ul<i><b>Sources:</b> <br> - Data based on the latest 2014 figures available in the <a href='http://www.globalcarbonatlas.org' target="_blank">Global Carbon Atlas</a> <br> - <a href='http://cdiac.ornl.gov/trends/emis/meth_reg.html' target="_blank">CDIAC</a>: Boden, TA, G Marland, and RJ Andres. 2013. Global, Regional, and National Fossil-Fuel CO2 Emissions. Carbon Dioxide Information Analysis Center (CDIAC), Oak Ridge National Laboratory, US Department of Energy, Oak Ridge, Tenn., USA doi:10.3334/CDIAC/00001_V2013
