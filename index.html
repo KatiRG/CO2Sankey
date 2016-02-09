@@ -266,6 +266,8 @@
 
           var path = sankey.link();
 
+          var formatX = d3.format("02d"); //for numbering countries in sort col and histogram x-axes
+
           // arrays to hold list of countries
           Africa = ['Africa', 'Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cape Verde', 'Central African Republic',
             'Chad', 'Comoros', 'Congo', "C\xf4te d'Ivoire", 'Democratic Republic of the Congo', 'Djibouti', 'Egypt',
@@ -602,8 +604,8 @@
                     })
                     .attr("dy", ".35em")
                     .attr("text-anchor", "start")
-                    .text(function(d, i) {
-                      return i + 1 + ": " + ynames[i];
+                    .text(function(d, i) {                      
+                      return formatX(i + 1) + " " + ynames[i];
                     })
                     .style("stroke-width", "2px")
                     .style("fill", "#555");
@@ -789,9 +791,7 @@
               data.sort(function(a, b) { return b.total - a.total; });
 
               x.domain(data.map(function(d) { return d.Country; }));
-              y.domain([0, d3.max(data, function(d) { return d.total; })]);
-
-              formatX = d3.format("02d"); //for numbering the countries on x-axis
+              y.domain([0, d3.max(data, function(d) { return d.total; })]);              
 
               svg3.append("g")
                 .attr("class", "x axis")
