@@ -444,7 +444,7 @@
             link.on("mouseover", function(d) {
                 div.transition()
                   .style("opacity", .9);
-                div.html(d.source.name + " → " + d.target.name +
+                div.html(d.source.name + " → " + d.target.name + 
                     "<br><b>" + format(d.value) + " " + units + "</b>")
                   .style("left", (d3.event.pageX) + "px")
                   .style("top", (d3.event.pageY) + "px");
@@ -492,7 +492,7 @@
             node.on("mouseover", function(d) {
                 div.transition()
                   .style("opacity", .9);
-                div.html(d.name + "<br><b>" + format(d.value) + "</b>")
+                div.html(d.name + "<br><b>" + format(d.value) + " " + units + "</b>")
                   .style("left", (d3.event.pageX) + "px")
                   .style("top", (d3.event.pageY) + "px");
               })
@@ -682,8 +682,7 @@
               return d3.svg.axis()
                 .scale(y)
                 .orient("left")
-                .ticks(10);
-                //.tickFormat(10, "5.3f");          
+                .ticks(10)
             }      
 
             var margin = {
@@ -716,7 +715,8 @@
             var yAxis = d3.svg.axis()
               .scale(y)
               .orient("left")
-              .tickFormat(d3.format(".2s"));
+              //.tickFormat(d3.format(".2s"))
+              .tickFormat(d3.format(".1f"));
 
             // append the svg to the chart div corresponding to the measure selected
             var svg3 = d3.select("#chart").append("div").attr("id", chartdiv)
