@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 
-<!--<script src="d3.v3.min.js"></script>-->
+<script src="d3.v3.min.js"></script>
 <script src="lib/jquery-1.10.2.min.js"></script>
 <!--bootstrap 3.0.2 -->
 <link href="lib/bootstrap.css" rel="stylesheet">
@@ -530,6 +530,9 @@
             // action for 'Sort all' button
             d3.select("#sortButton")
               .on("click", function() {
+                console.log("col_xcoord: ", col_xcoord.sort(sortAscending))
+                col_xcoord = col_xcoord.sort(sortAscending);
+                console.log("col_xcoord after sort: ", col_xcoord)
                 //toggle button
                 if (d3.select("#sortButton").text() === "Clear") {
                   svg2.selectAll("*").remove(); //clears sort rects
@@ -547,7 +550,8 @@
                   // Sort the rect heights by decreasing size and store in array      
                   d3.selectAll("g.node")
                     .filter(function(d) {
-                      if (d.x === col_xcoord[2]) { //select rects in last column (countries)
+                      //console.log("d.x outside: ", d.x)
+                      if (d.x === col_xcoord[2]) { //select rects in last column (countries)                    
                         yheight.push(d.dy);
                         yheight.sort(sortDescending);
                         return yheight;
@@ -565,6 +569,9 @@
                       if (d.x === col_xcoord[2]) { //selects last col (countries)
                         dfilt = d;
                         ynames[idx] = d.name; //save country names
+                        console.log("dfilt: ", dfilt)
+                        console.log("idx: ", idx)
+                        console.log("ynames: ", ynames)
 
                         var rect = svg2.append("g")
                           .append("rect")
