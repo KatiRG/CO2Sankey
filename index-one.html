@@ -8,8 +8,6 @@
 <script src="lib/bootstrap.min.js"></script>
 <link href="lib/sticky-footer-navbar.css" rel="stylesheet">
 
-<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
-
 <title>CO2 Emissions 2014</title>
 <style>
   body {
@@ -366,13 +364,13 @@
                 chartdiv = "Mchart";
                 showStackedBars(chartdiv);  
 
-                fname = "MtCO2perGDP_byCountry.tsv";
-                chartdiv = "GDPchart";
-                showStackedBars(chartdiv);
+                // fname = "MtCO2perGDP_byCountry.tsv";
+                // chartdiv = "GDPchart";
+                // showStackedBars(chartdiv);
 
-                fname = "MtCO2perPop_byCountry.tsv";
-                chartdiv = "POPchart";
-                showStackedBars(chartdiv);
+                // fname = "MtCO2perPop_byCountry.tsv";
+                // chartdiv = "POPchart";
+                // showStackedBars(chartdiv);
               }
 
 
@@ -530,9 +528,6 @@
             // action for 'Sort all' button
             d3.select("#sortButton")
               .on("click", function() {
-                console.log("col_xcoord: ", col_xcoord.sort(sortAscending))
-                col_xcoord = col_xcoord.sort(sortAscending);
-                console.log("col_xcoord after sort: ", col_xcoord)
                 //toggle button
                 if (d3.select("#sortButton").text() === "Clear") {
                   svg2.selectAll("*").remove(); //clears sort rects
@@ -550,8 +545,7 @@
                   // Sort the rect heights by decreasing size and store in array      
                   d3.selectAll("g.node")
                     .filter(function(d) {
-                      //console.log("d.x outside: ", d.x)
-                      if (d.x === col_xcoord[2]) { //select rects in last column (countries)                    
+                      if (d.x === col_xcoord[2]) { //select rects in last column (countries)
                         yheight.push(d.dy);
                         yheight.sort(sortDescending);
                         return yheight;
@@ -569,9 +563,6 @@
                       if (d.x === col_xcoord[2]) { //selects last col (countries)
                         dfilt = d;
                         ynames[idx] = d.name; //save country names
-                        console.log("dfilt: ", dfilt)
-                        console.log("idx: ", idx)
-                        console.log("ynames: ", ynames)
 
                         var rect = svg2.append("g")
                           .append("rect")
@@ -1221,7 +1212,7 @@
         </script>
 
         <p style='width: 1000px;'>
-          <ul<i><b>Sources:</b> <br> - <a href='http://www.globalcarbonproject.org' target="_blank">Global Carbon Project</a> (with data from <a href='http://www.globalcarbonatlas.org' target="_blank">Global Carbon Atlas</a>) <br> - <a href='http://cdiac.ornl.gov' target="_blank">Carbon Dioxide Information Analysis Center (CDIAC) </a>
+          <ul<i><b>Sources:</b> <br> - Data based on the latest 2014 figures available in the <a href='http://www.globalcarbonatlas.org' target="_blank">Global Carbon Atlas</a> <br> - <a href='http://cdiac.ornl.gov/trends/emis/meth_reg.html' target="_blank">CDIAC</a>: Boden, TA, G Marland, and RJ Andres. 2013. Global, Regional, and National Fossil-Fuel CO2 Emissions. Carbon Dioxide Information Analysis Center (CDIAC), Oak Ridge National Laboratory, US Department of Energy, Oak Ridge, Tenn., USA doi:10.3334/CDIAC/00001_V2013
 
             </ul>
 
