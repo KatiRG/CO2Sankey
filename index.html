@@ -540,8 +540,7 @@
                   var yheight = []; //array to store sorted rect height array
                   var yval = []; //array to store calculated ycoords
                   var ynames = []; //array to store sorted names
-                  delta = 10; //spacing between rects
-		              var sort_y = [];
+                  delta = 10; //spacing between rects		              
 
                   //d3.select(this).attr("class", "selected");
                   d3.select(this).text("Clear");
@@ -561,48 +560,43 @@
 
                     });
 
-                  d3.selectAll("g.node")
-                    .filter(function(d) {
-                      if (d.x === col_xcoord[2]) { //select rects in last column (countries)
-                  			var match_idx = yheight.indexOf(d.dy);
-                  			if (match_idx != -1) {
-                  				sort_y[match_idx] = d.dy; //store rect heights
-                          ynames[match_idx] = d.name; //store rect names
-                  			}
-                  	  }
-                    });
-
-
                   // Plot rects in order of increasing height on an svg2 canvas
                   d3.selectAll("g.node")
                     .filter(function(d) {
                       if (d.x === col_xcoord[2]) { //select rects in last column (countries)
-                        var rect = svg2.append("g")
-	                          .append("rect")
-       		                  .attr("height", function(d) {
-       		                   return sort_y[idx];
-               		          })
-                       		  .attr("width", sankey.nodeWidth())
-                            .attr("transform", function(d) {
-                            	if (idx === 0) yval[idx] = 0; //first rect is at (0,0)
-                            	else yval[idx] = yval[idx - 1] + yheight[idx - 1] + delta;
-                            	return "translate(" + 0 + "," + yval[idx] + ")";
+                  			var match_idx = yheight.indexOf(d.dy);
+                  			if (match_idx != -1) {                  				
+                          ynames[match_idx] = d.name; //store rect names
+
+                          var rect = svg2.append("g")
+                            .append("rect")
+                            .attr("height", function(d) {
+                             return yheight[idx];
                             })
-                          	.style("fill", function(d) {
-                            		if (Europe.indexOf(ynames[idx]) != -1) return Europe_color
-                            		else if (NorthAmerica.indexOf(ynames[idx]) != -1) return NorthAmerica_color
-                            		else if (CentralAmerica.indexOf(ynames[idx]) != -1) return CentralAmerica_color
-                            		else if (SouthAmerica.indexOf(ynames[idx]) != -1) return SouthAmerica_color
-                            		else if (Asia.indexOf(ynames[idx]) != -1) return Asia_color
-                            		else if (MiddleEast.indexOf(ynames[idx]) != -1) return MiddleEast_color
-                            		else if (Africa.indexOf(ynames[idx]) != -1) return Africa_color
-                            		else if (Oceania.indexOf(ynames[idx]) != -1) return Oceania_color
-                          	})
-                          	.style("stroke-width", "2px")
-                          	.style("stroke", "#555");
+                            .attr("width", sankey.nodeWidth())
+                            .attr("transform", function(d) {
+                              if (idx === 0) yval[idx] = 0; //first rect is at (0,0)
+                              else yval[idx] = yval[idx - 1] + yheight[idx - 1] + delta;
+                              return "translate(" + 0 + "," + yval[idx] + ")";
+                            })
+                            .style("fill", function(d) {
+                                if (Europe.indexOf(ynames[idx]) != -1) return Europe_color
+                                else if (NorthAmerica.indexOf(ynames[idx]) != -1) return NorthAmerica_color
+                                else if (CentralAmerica.indexOf(ynames[idx]) != -1) return CentralAmerica_color
+                                else if (SouthAmerica.indexOf(ynames[idx]) != -1) return SouthAmerica_color
+                                else if (Asia.indexOf(ynames[idx]) != -1) return Asia_color
+                                else if (MiddleEast.indexOf(ynames[idx]) != -1) return MiddleEast_color
+                                else if (Africa.indexOf(ynames[idx]) != -1) return Africa_color
+                                else if (Oceania.indexOf(ynames[idx]) != -1) return Oceania_color
+                            })
+                            .style("stroke-width", "2px")
+                            .style("stroke", "#555");
                         idx++;
-		      	          }
-		                })
+
+                  			}
+                  	  }
+                    });
+
 
                   // add text
                   svg2.selectAll("g")
