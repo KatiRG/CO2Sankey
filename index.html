@@ -295,7 +295,7 @@
           MiddleEast = ['Middle East', 'Bahrain', 'Iraq', 'Iran', 'Israel', 'Jordan', 'Kuwait', 'Lebanon', 'Occupied Palestinian Territory',
             'Oman', 'Qatar', 'Saudi Arabia', 'Syria', 'Turkey', 'United Arab Emirates', 'Yemen'
           ];
-          NorthAmerica = ['North America', 'Canada', 'Greenland', 'Mexico', 'Saint Pierre and Miquelon', 'USA'];
+          NorthAmerica = ['North America', 'Canada', 'Greenland', 'Mexico', 'Saint Pierre and Miquelon', 'United States of America'];
           Oceania = ['Oceania', 'Australia', 'Cook Islands', 'Micronesia (Federated States of)', 'Fiji', 'French Polynesia',
             'Kiribati', 'Marshall Islands', 'Nauru', 'New Caledonia', 'New Zealand', 'Niue', 'Palau',
             'Samoa', 'Solomon Islands', 'Tonga', 'Vanuatu', 'Wallis and Futuna Islands'
@@ -541,8 +541,9 @@
                   var ynames = []; //array to store sorted names
                   delta = 10; //spacing between rects
                   var sort_y = [];
-                  //d3.select(this).attr("class", "selected");
+                  
                   d3.select(this).text("Clear");
+
                   // Sort the rect heights by decreasing size and store in array      
                   d3.selectAll("g.node")
                     .filter(function(d) {
@@ -596,7 +597,8 @@
                         idx++;
                       }
                     })
-                    // add text
+
+                  // add text
                   svg2.selectAll("g")
                     .append("text")
                     .attr("x", 26)
@@ -610,6 +612,7 @@
                     })
                     .style("stroke-width", "2px")
                     .style("fill", "#555");
+                    
                 } //end button toggle check
               }); //end 'sort All' button action
 
